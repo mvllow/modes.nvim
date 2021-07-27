@@ -2,9 +2,9 @@
 
 > Currently in alpha. Many things are broken.
 
-Highlights UI elements based on the current mode. Inspired by the recent addition of vim mode in Xcode-beta.
+Highlight UI elements based on current mode. Inspired by the recent addition of vim mode in Xcode-beta.
 
-## Install
+## Usage
 
 ```lua
 use({
@@ -15,6 +15,6 @@ use({
 })
 ```
 
-## Usage
+## Options
 
-Coming soon..
+In the future, highlight groups will be customizable. More documentation coming soon!
