@@ -1,6 +1,6 @@
 # modes.nvim
 
-> Currently in alpha. Many things are broken.
+> !! Currently in alpha. Many things are broken. Neovim will randomly crash. !!
 
 Highlight UI elements based on current mode. Inspired by the recent addition of vim mode in Xcode-beta.
 
