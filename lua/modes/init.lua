@@ -19,15 +19,15 @@ function M.set_highlights(style)
 	end
 
 	if style == "delete" then
-		cmd("hi CursorLine guibg=#2C1F2B")
 		cmd("hi CursorLineNr guifg=#C75C6A")
 		cmd("hi ModeMsg guifg=#C75C6A")
+		cmd("hi CursorLine guibg=#35222e")
 	end
 
 	if style == "insert" then
-		cmd("hi CursorLine guibg=#232933")
 		cmd("hi CursorLineNr guifg=#78CCC5")
 		cmd("hi ModeMsg guifg=#78CCC5")
+		cmd("hi CursorLine guibg=#29323b")
 	end
 
 	if style == "visual" then
