@@ -12,7 +12,6 @@ end
 function M.set_highlights(style)
 	if style == "reset" then
 		-- TODO: These should reset to the active colorscheme's defaults
-		cmd("hi Visual guibg=#2a2837")
 		cmd("hi CursorLine guibg=#211f2d")
 		cmd("hi CursorLineNr guifg=#e0def4")
 		cmd("hi ModeMsg guifg=None")
@@ -32,7 +31,6 @@ function M.set_highlights(style)
 	end
 
 	if style == "visual" then
-		cmd("hi Visual guibg=#2A1F39")
 		cmd("hi CursorLine guibg=#2A1F39")
 		cmd("hi CursorLineNr guifg=#9745BE")
 		cmd("hi ModeMsg guifg=#9745BE")
@@ -41,6 +39,9 @@ end
 
 function M.setup()
 	local last_mode = ""
+	-- Set common highlights
+	cmd("hi Visual guibg=#2A1F39")
+
 	-- Set cursor highlights
 	cmd("hi vCursor guifg=#e0def4 guibg=#9745be")
 	cmd("hi iCursor guifg=#191724 guibg=#78ccc5")
