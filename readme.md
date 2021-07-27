@@ -23,7 +23,7 @@ In the future, highlight groups will be customizable. More documentation coming 
 
 ## Known issues
 
-Some Which Key presets conflict with this plugin.
+- Some Which Key presets conflict with this plugin
 
 **Workaround**
 
@@ -37,3 +37,5 @@ require('which-key').setup({
   },
 })
 ```
+
+- Line highlights are applied to all buffers, not just the active one
