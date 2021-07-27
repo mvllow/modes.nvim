@@ -14,7 +14,7 @@ function M.set_highlights(style)
 		-- TODO: These should reset to the active colorscheme's defaults
 		cmd("hi CursorLine guibg=#211f2d")
 		cmd("hi CursorLineNr guifg=#e0def4")
-		cmd("hi ModeMsg guifg=None")
+		cmd("hi ModeMsg guifg=#e0def4")
 		return
 	end
 
