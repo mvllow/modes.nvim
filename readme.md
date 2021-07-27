@@ -18,3 +18,20 @@ use({
 ## Options
 
 In the future, highlight groups will be customizable. More documentation coming soon!
+
+## Known issues
+
+Some Which Key presets conflict with this plugin.
+
+Workaround:
+
+```lua
+require('which-key').setup({
+  plugins = {
+    presets = {
+      -- Disable operators
+      operators = false,
+    },
+  },
+})
+```
