@@ -38,7 +38,6 @@ function M.set_highlights(style)
 end
 
 function M.setup()
-	local last_mode = ""
 	-- Set common highlights
 	cmd("hi Visual guibg=#2A1F39")
 
@@ -53,25 +52,19 @@ function M.setup()
 	vim.register_keystroke_callback(function(key)
 		local current_mode = fn.mode()
 
-		if
-			(key == M.get_termcode("<esc>"))
-			or (current_mode == "c")
-			or (last_mode == "V" and not current_mode == "V")
-		then
+		if key == M.get_termcode("<esc>") then
 			M.set_highlights("reset")
-			return
 		end
 
-		if fn.mode() == "n" then
+		if current_mode == "n" then
 			if key == "d" then
 				M.set_highlights("delete")
 			end
+
 			if key == "v" or key == "V" then
 				M.set_highlights("visual")
 			end
 		end
-
-		last_mode = current_mode
 	end)
 
 	utils.define_augroups({
