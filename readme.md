@@ -23,7 +23,7 @@ In the future, highlight groups will be customizable. More documentation coming 
 
 ## Known issues
 
-- Some Which Key presets conflict with this plugin
+- Some Which Key presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if `operators = true` because Which Key takes priority
 
 **Workaround**
 
