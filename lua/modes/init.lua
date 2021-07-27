@@ -1,5 +1,6 @@
 local utils = require("modes.utils")
 local cmd = vim.cmd
+local opt = vim.opt
 local fn = vim.fn
 
 local M = {}
@@ -40,6 +41,13 @@ end
 
 function M.setup()
 	local last_mode = ""
+	-- Set cursor highlights
+	cmd("hi vCursor guifg=#e0def4 guibg=#9745be")
+	cmd("hi iCursor guifg=#191724 guibg=#78ccc5")
+	cmd("hi dCursor guifg=#e0def4 guibg=#c75c6a")
+
+	-- Set guicursor modes
+	opt.guicursor = "v-sm:block-vCursor,i-ci-ve:ver25-iCursor,r-cr-o:hor20-dCursor"
 
 	vim.register_keystroke_callback(function(key)
 		local current_mode = fn.mode()
