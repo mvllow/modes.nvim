@@ -15,7 +15,6 @@ function M.set_highlights(style)
 		cmd("hi CursorLine guibg=#211f2d")
 		cmd("hi CursorLineNr guifg=#e0def4")
 		cmd("hi ModeMsg guifg=#e0def4")
-		return
 	end
 
 	if style == "delete" then
@@ -60,11 +59,19 @@ function M.setup()
 	vim.register_keystroke_callback(function(key)
 		local current_mode = fn.mode()
 
-		if key == M.get_termcode("<esc>") then
-			M.set_highlights("reset")
+		-- Insert mode
+		if current_mode == "i" then
+			if key == M.get_termcode("<esc>") then
+				M.set_highlights("reset")
+			end
 		end
 
+		-- Normal mode
 		if current_mode == "n" then
+			if key == M.get_termcode("<esc>") then
+				M.set_highlights("reset")
+			end
+
 			if key == "d" then
 				M.set_highlights("delete")
 			end
