@@ -22,6 +22,14 @@ function M.set_highlights(style)
 		cmd("hi CursorLine guibg=#35222e")
 		cmd("hi CursorLineNr guifg=#c75c6a")
 		cmd("hi ModeMsg guifg=#c75c6a")
+		cmd("hi oCursor guifg=#e0def4 guibg=#c75c6a")
+	end
+
+	if style == "yank" then
+		cmd("hi CursorLine guibg=#38312d")
+		cmd("hi CursorLineNr guifg=#f5c359")
+		cmd("hi ModeMsg guifg=#f5c359")
+		cmd("hi oCursor guifg=#191724 guibg=#f5c359")
 	end
 
 	if style == "insert" then
@@ -44,10 +52,10 @@ function M.setup()
 	-- Set cursor highlights
 	cmd("hi vCursor guifg=#e0def4 guibg=#9745be")
 	cmd("hi iCursor guifg=#191724 guibg=#78ccc5")
-	cmd("hi dCursor guifg=#e0def4 guibg=#c75c6a")
+	cmd("hi oCursor guifg=#e0def4 guibg=#c75c6a")
 
 	-- Set guicursor modes
-	opt.guicursor = "v-sm:block-vCursor,i-ci-ve:ver25-iCursor,r-cr-o:hor20-dCursor"
+	opt.guicursor = "v-sm:block-vCursor,i-ci-ve:ver25-iCursor,r-cr-o:hor20-oCursor"
 
 	vim.register_keystroke_callback(function(key)
 		local current_mode = fn.mode()
@@ -59,6 +67,10 @@ function M.setup()
 		if current_mode == "n" then
 			if key == "d" then
 				M.set_highlights("delete")
+			end
+
+			if key == "y" then
+				M.set_highlights("yank")
 			end
 
 			if key == "v" or key == "V" then
