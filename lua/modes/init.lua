@@ -84,6 +84,20 @@ function M.setup()
 				M.set_highlights("visual")
 			end
 		end
+
+		-- Visual mode
+		if current_mode == "v" then
+			if key == M.get_termcode("<esc>") then
+				M.set_highlights("reset")
+			end
+		end
+
+		-- Visual line mode
+		if current_mode == "V" then
+			if key == M.get_termcode("<esc>") then
+				M.set_highlights("reset")
+			end
+		end
 	end)
 
 	utils.define_augroups({
