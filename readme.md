@@ -25,7 +25,7 @@ In the future, highlight groups will be customizable. More documentation coming 
 
 Some Which Key presets conflict with this plugin.
 
-Workaround:
+**Workaround**
 
 ```lua
 require('which-key').setup({
