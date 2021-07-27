@@ -4,6 +4,8 @@
 
 Highlight UI elements based on current mode. Inspired by the recent addition of vim mode in Xcode-beta.
 
+Currently you will see highlights when in insert mode, visual mode, or when pressing the operator keys `d` or `y`.
+
 ## Usage
 
 ```lua
