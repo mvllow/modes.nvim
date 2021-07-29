@@ -21,6 +21,8 @@ use({
 
 ## Options
 
+> Note: `vim.opt.cursorline` must be set to true for lines to be highlighted
+
 In the future, highlight groups will be customizable. More documentation coming soon!
 
 ## Known issues
