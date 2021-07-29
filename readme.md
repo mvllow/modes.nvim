@@ -10,7 +10,10 @@ Highlight UI elements based on current mode. Inspired by the recent addition of 
 use({
   'mvllow/modes.nvim',
   config = function()
-    require('modes').setup()
+    require('modes').setup({
+      -- Optional
+      enable_cursorline = true
+    })
   end
 })
 ```

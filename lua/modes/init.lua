@@ -44,7 +44,11 @@ function M.set_highlights(style)
 	end
 end
 
-function M.setup()
+function M.setup(options)
+	if options.enable_cursorline then
+		vim.opt.cursorline = true
+	end
+
 	-- Set common highlights
 	cmd("hi Visual guibg=#2A1F39")
 
