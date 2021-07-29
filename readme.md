@@ -12,10 +12,7 @@ Currently you will see highlights when in insert mode, visual mode, or when pres
 use({
   'mvllow/modes.nvim',
   config = function()
-    require('modes').setup({
-      -- Optional
-      enable_cursorline = true
-    })
+    require('modes').setup()
   end
 })
 ```
