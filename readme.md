@@ -1,10 +1,8 @@
 # modes.nvim
 
-> !! Currently in alpha. Things may break !!
+> Prismatic line decorations for the adventurous vim user
 
-Highlight UI elements based on current mode. Inspired by the recent addition of vim mode in Xcode-beta.
-
-Currently you will see highlights when in insert mode, visual mode, or when pressing the operator keys `d` or `y`.
+Highlight UI elements based on current mode. Inspired by the recent addition of vim bindings in Xcode-beta.
 
 ## Usage
 
@@ -23,13 +21,34 @@ use({
 
 > Note: `vim.opt.cursorline` must be set to true for lines to be highlighted
 
+Default colors can be overridden by passing values to the setup function or updating highlight groups (useful for themes).
+
+```lua
+-- Pass colors through setup
+require('modes').setup({
+  colors = {
+    copy = "#f5c359",
+    delete = "#c75c6a",
+    insert = "#78ccc5",
+    visual = "#9745be",
+  },
+  line_opacity = 0.1
+})
+
+-- Or use highlight groups (useful for themes)
+vim.cmd('hi ModesCopy guibg=#f5c359),
+vim.cmd('hi ModesDelete guibg=#c75c6a),
+vim.cmd('hi ModesInsert guibg=#78ccc5),
+vim.cmd('hi ModesVisual guibg=#9745be),
+```
+
 In the future, highlight groups will be customizable. More documentation coming soon!
 
 ## Known issues
 
-- Some Which Key presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if `operators = true` because Which Key takes priority
+- Some _Which Key_ presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if `operators = true` because _Which Key_ takes priority
 
-**Workaround**
+_Workaround:_
 
 ```lua
 require('which-key').setup({
@@ -43,3 +62,4 @@ require('which-key').setup({
 ```
 
 - Line highlights are applied to all buffers, not just the active one
+- Named colors are not yet supported. For example, `colors.copy = 'blue'` does not work. _Workaround: use complete hex colors_
