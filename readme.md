@@ -15,7 +15,7 @@ use({
 })
 ```
 
-![Jul-27-2021 13-19-12](https://user-images.githubusercontent.com/1474821/127207394-0cca49b9-1cb0-4869-9310-9f9a922d3da0.gif)
+![modes.nvim](https://user-images.githubusercontent.com/1474821/127896095-6da221cf-3327-4eed-82be-ce419bdf647c.gif)
 
 ## Options
 
