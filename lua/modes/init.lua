@@ -1,4 +1,4 @@
-local utils = require("modes.utils")
+local util = require("modes.util")
 local cmd = vim.cmd
 local opt = vim.opt
 local fn = vim.fn
@@ -54,16 +54,16 @@ end
 
 function modes.set_colors()
 	colors = {
-		copy = (user_colors and user_colors.copy) or utils.get_bg_from_hl("ModesCopy", "#f5c359"),
-		delete = (user_colors and user_colors.delete) or utils.get_bg_from_hl("ModesDelete", "#c75c6a"),
-		insert = (user_colors and user_colors.insert) or utils.get_bg_from_hl("ModesInsert", "#78ccc5"),
-		visual = (user_colors and user_colors.visual) or utils.get_bg_from_hl("ModesVisual", "#9745be"),
+		copy = (user_colors and user_colors.copy) or util.get_bg_from_hl("ModesCopy", "#f5c359"),
+		delete = (user_colors and user_colors.delete) or util.get_bg_from_hl("ModesDelete", "#c75c6a"),
+		insert = (user_colors and user_colors.insert) or util.get_bg_from_hl("ModesInsert", "#78ccc5"),
+		visual = (user_colors and user_colors.visual) or util.get_bg_from_hl("ModesVisual", "#9745be"),
 	}
 	dim_colors = {
-		copy = utils.blend(colors.copy, utils.get_bg_from_hl("Normal", "Normal"), line_opacity),
-		delete = utils.blend(colors.delete, utils.get_bg_from_hl("Normal", "Normal"), line_opacity),
-		insert = utils.blend(colors.insert, utils.get_bg_from_hl("Normal", "Normal"), line_opacity),
-		visual = utils.blend(colors.visual, utils.get_bg_from_hl("Normal", "Normal"), line_opacity),
+		copy = util.blend(colors.copy, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
+		delete = util.blend(colors.delete, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
+		insert = util.blend(colors.insert, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
+		visual = util.blend(colors.visual, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
 	}
 
 	cmd("hi ModesCopy guibg=" .. colors.copy)
@@ -83,9 +83,9 @@ function modes.setup(opts)
 	end, 15)
 
 	initial_colors = {
-		CursorLine = utils.get_bg_from_hl("CursorLine", "CursorLine"),
-		CursorLineNr = utils.get_fg_from_hl("CursorLineNr", "CursorLineNr"),
-		ModeMsg = utils.get_fg_from_hl("ModeMsg", "ModeMsg"),
+		CursorLine = util.get_bg_from_hl("CursorLine", "CursorLine"),
+		CursorLineNr = util.get_fg_from_hl("CursorLineNr", "CursorLineNr"),
+		ModeMsg = util.get_fg_from_hl("ModeMsg", "ModeMsg"),
 	}
 
 	-- Set common highlights
@@ -101,14 +101,14 @@ function modes.setup(opts)
 
 		-- Insert mode
 		if current_mode == "i" then
-			if key == utils.get_termcode("<esc>") then
+			if key == util.get_termcode("<esc>") then
 				modes.reset()
 			end
 		end
 
 		-- Normal mode
 		if current_mode == "n" then
-			if key == utils.get_termcode("<esc>") then
+			if key == util.get_termcode("<esc>") then
 				modes.reset()
 			end
 
@@ -137,20 +137,20 @@ function modes.setup(opts)
 
 		-- Visual mode
 		if current_mode == "v" then
-			if key == utils.get_termcode("<esc>") then
+			if key == util.get_termcode("<esc>") then
 				modes.reset()
 			end
 		end
 
 		-- Visual line mode
 		if current_mode == "V" then
-			if key == utils.get_termcode("<esc>") then
+			if key == util.get_termcode("<esc>") then
 				modes.reset()
 			end
 		end
 	end)
 
-	utils.define_augroups({
+	util.define_augroups({
 		_modes = {
 			{
 				"InsertEnter",
