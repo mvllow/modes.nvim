@@ -1,45 +1,25 @@
 local utils = {}
 
--- @test: -1 value (eg. Normal guifg=NONE)
--- @test: word value (eg. 'blue')
-local function hexToRgb(hex_str)
-	local hex = "[abcdef0-9][abcdef0-9]"
-	local pat = "^#(" .. hex .. ")(" .. hex .. ")(" .. hex .. ")$"
+local function get_byte(value, offset)
+	return bit.band(bit.rshift(value, offset), 0xFF)
+end
 
-	hex_str = string.lower(hex_str)
+local function get_color(color)
+	color = vim.api.nvim_get_color_by_name(color)
 
-	if string.find(hex_str, pat) == nil then
-		hex_str = tostring(vim.api.nvim_get_color_by_name(hex_str))
-		if hex_str == "-1" then
-			if vim.opt.background:get() == "dark" then
-				hex_str = "#282828"
-			else
-				hex_str = "#fefefe"
-			end
-		end
-
-		if hex_str:len() == 3 then
-			hex_str = "#" .. hex_str .. hex_str
-		end
-		if hex_str:len() == 6 then
-			hex_str = "#" .. hex_str
-		end
+	if color == -1 then
+		color = vim.opt.background:get() == "dark" and 000 or 255255255
 	end
 
-	hex_str = string.lower(hex_str)
-
-	assert(string.find(hex_str, pat) ~= nil, "hex_to_rgb: invalid hex_str: " .. tostring(hex_str))
-
-	local r, g, b = string.match(hex_str, pat)
-	return { tonumber(r, 16), tonumber(g, 16), tonumber(b, 16) }
+	return { get_byte(color, 16), get_byte(color, 8), get_byte(color, 0) }
 end
 
 ---@param fg string foreground color
 ---@param bg string background color
 ---@param alpha number number between 0 and 1. 0 results in bg, 1 results in fg
 function utils.blend(fg, bg, alpha)
-	bg = hexToRgb(bg)
-	fg = hexToRgb(fg)
+	bg = get_color(bg)
+	fg = get_color(fg)
 
 	local blendChannel = function(i)
 		local ret = (alpha * fg[i] + ((1 - alpha) * bg[i]))
