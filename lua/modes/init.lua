@@ -4,11 +4,10 @@ local opt = vim.opt
 local fn = vim.fn
 
 local modes = {}
+local config = {}
 local colors = {}
 local dim_colors = {}
-local user_colors = {}
-local initial_colors = {}
-local line_opacity = 0.15
+local init_colors = {}
 local operator_started = false
 
 function modes.reset()
@@ -18,9 +17,9 @@ end
 
 function modes.set_highlights(style)
 	if style == "init" then
-		cmd("hi CursorLine guibg=" .. initial_colors.CursorLine)
-		cmd("hi CursorLineNr guifg=" .. initial_colors.CursorLineNr)
-		cmd("hi ModeMsg guifg=" .. initial_colors.ModeMsg)
+		cmd("hi CursorLine guibg=" .. init_colors.cursor_line)
+		cmd("hi CursorLineNr guifg=" .. init_colors.cursor_line_nr)
+		cmd("hi ModeMsg guifg=" .. init_colors.mode_msg)
 	end
 
 	if style == "copy" then
@@ -54,16 +53,16 @@ end
 
 function modes.set_colors()
 	colors = {
-		copy = (user_colors and user_colors.copy) or util.get_bg_from_hl("ModesCopy", "#f5c359"),
-		delete = (user_colors and user_colors.delete) or util.get_bg_from_hl("ModesDelete", "#c75c6a"),
-		insert = (user_colors and user_colors.insert) or util.get_bg_from_hl("ModesInsert", "#78ccc5"),
-		visual = (user_colors and user_colors.visual) or util.get_bg_from_hl("ModesVisual", "#9745be"),
+		copy = config.colors.copy or util.get_bg_from_hl("ModesCopy", "#f5c359"),
+		delete = config.colors.delete or util.get_bg_from_hl("ModesDelete", "#c75c6a"),
+		insert = config.colors.insert or util.get_bg_from_hl("ModesInsert", "#78ccc5"),
+		visual = config.colors.visual or util.get_bg_from_hl("ModesVisual", "#9745be"),
 	}
 	dim_colors = {
-		copy = util.blend(colors.copy, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
-		delete = util.blend(colors.delete, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
-		insert = util.blend(colors.insert, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
-		visual = util.blend(colors.visual, util.get_bg_from_hl("Normal", "Normal"), line_opacity),
+		copy = util.blend(colors.copy, init_colors.normal, config.line_opacity),
+		delete = util.blend(colors.delete, init_colors.normal, config.line_opacity),
+		insert = util.blend(colors.insert, init_colors.normal, config.line_opacity),
+		visual = util.blend(colors.visual, init_colors.normal, config.line_opacity),
 	}
 
 	cmd("hi ModesCopy guibg=" .. colors.copy)
@@ -73,20 +72,36 @@ function modes.set_colors()
 end
 
 function modes.setup(opts)
-	user_colors = (opts and opts.colors)
-	line_opacity = (opts and opts.line_opacity) or 0.15
+	if opts == nil then
+		opts = {
+			colors = {},
+			line_opacity = 0.15,
+		}
+	elseif opts == {} then
+		-- Use default colors
+		-- Overrides highlight groups if any, eg. ModesVisual
+		opts.colors = {
+			copy = "#f5c359",
+			delete = "#c75c6a",
+			insert = "#78ccc5",
+			visual = "#9745be",
+		}
+	end
+
+	config = opts
+
+	init_colors = {
+		cursor_line = util.get_bg_from_hl("CursorLine", "CursorLine"),
+		cursor_line_nr = util.get_fg_from_hl("CursorLineNr", "CursorLineNr"),
+		mode_msg = util.get_fg_from_hl("ModeMsg", "ModeMsg"),
+		normal = util.get_bg_from_hl("Normal", "Normal"),
+	}
 
 	-- Hack to ensure theme colors get loaded properly
 	modes.set_colors()
 	vim.defer_fn(function()
 		modes.set_colors()
 	end, 15)
-
-	initial_colors = {
-		CursorLine = util.get_bg_from_hl("CursorLine", "CursorLine"),
-		CursorLineNr = util.get_fg_from_hl("CursorLineNr", "CursorLineNr"),
-		ModeMsg = util.get_fg_from_hl("ModeMsg", "ModeMsg"),
-	}
 
 	-- Set common highlights
 	cmd("hi Visual guibg=" .. dim_colors.visual)
