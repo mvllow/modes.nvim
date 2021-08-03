@@ -11,12 +11,16 @@ local initial_colors = {}
 local line_opacity = 0.15
 local operator_started = false
 
+function modes.reset()
+	modes.set_highlights("init")
+	operator_started = false
+end
+
 function modes.set_highlights(style)
-	if style == "reset" then
+	if style == "init" then
 		cmd("hi CursorLine guibg=" .. initial_colors.CursorLine)
 		cmd("hi CursorLineNr guifg=" .. initial_colors.CursorLineNr)
 		cmd("hi ModeMsg guifg=" .. initial_colors.ModeMsg)
-		operator_started = false
 	end
 
 	if style == "copy" then
@@ -98,19 +102,19 @@ function modes.setup(opts)
 		-- Insert mode
 		if current_mode == "i" then
 			if key == utils.get_termcode("<esc>") then
-				modes.set_highlights("reset")
+				modes.reset()
 			end
 		end
 
 		-- Normal mode
 		if current_mode == "n" then
 			if key == utils.get_termcode("<esc>") then
-				modes.set_highlights("reset")
+				modes.reset()
 			end
 
 			if key == "y" then
 				if operator_started then
-					modes.set_highlights("reset")
+					modes.reset()
 				else
 					modes.set_highlights("copy")
 					operator_started = true
@@ -119,7 +123,7 @@ function modes.setup(opts)
 
 			if key == "d" then
 				if operator_started then
-					modes.set_highlights("reset")
+					modes.reset()
 				else
 					modes.set_highlights("delete")
 					operator_started = true
@@ -134,14 +138,14 @@ function modes.setup(opts)
 		-- Visual mode
 		if current_mode == "v" then
 			if key == utils.get_termcode("<esc>") then
-				modes.set_highlights("reset")
+				modes.reset()
 			end
 		end
 
 		-- Visual line mode
 		if current_mode == "V" then
 			if key == utils.get_termcode("<esc>") then
-				modes.set_highlights("reset")
+				modes.reset()
 			end
 		end
 	end)
@@ -156,7 +160,7 @@ function modes.setup(opts)
 			{
 				"CmdlineLeave,InsertLeave,TextYankPost",
 				"*",
-				'lua require("modes").set_highlights("reset")',
+				'lua require("modes").reset()',
 			},
 		},
 	})
