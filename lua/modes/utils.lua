@@ -5,6 +5,16 @@ local function hexToRgb(hex_str)
 	local pat = "^#(" .. hex .. ")(" .. hex .. ")(" .. hex .. ")$"
 	hex_str = string.lower(hex_str)
 
+	if string.find(hex_str, pat) == nil then
+		hex_str = tostring(vim.api.nvim_get_color_by_name(hex_str))
+		if hex_str:len() == 3 then
+			hex_str = "#" .. hex_str .. hex_str
+		end
+		if hex_str:len() == 6 then
+			hex_str = "#" .. hex_str
+		end
+	end
+
 	assert(string.find(hex_str, pat) ~= nil, "hex_to_rgb: invalid hex_str: " .. tostring(hex_str))
 
 	local r, g, b = string.match(hex_str, pat)
