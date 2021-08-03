@@ -21,7 +21,7 @@ use({
 
 > Note: `vim.opt.cursorline` must be set to true for lines to be highlighted
 
-Default colors can be overridden by passing values to the setup function or updating highlight groups (useful for themes).
+Default colors can be overridden by passing values to the setup function or updating highlight groups.
 
 ```lua
 -- Pass colors through setup
@@ -42,8 +42,6 @@ vim.cmd('hi ModesInsert guibg=#78ccc5),
 vim.cmd('hi ModesVisual guibg=#9745be),
 ```
 
-In the future, highlight groups will be customizable. More documentation coming soon!
-
 ## Known issues
 
 - Some _Which Key_ presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if `operators = true` because _Which Key_ takes priority
@@ -62,4 +60,3 @@ require('which-key').setup({
 ```
 
 - Line highlights are applied to all buffers, not just the active one
-- Named colors are not yet supported. For example, `colors.copy = 'blue'` does not work. _Workaround: use complete hex colors_
