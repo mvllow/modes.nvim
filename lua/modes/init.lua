@@ -27,16 +27,16 @@ function modes.set_highlights(style)
 		cmd("hi CursorLine guibg=" .. dim_colors.copy)
 		cmd("hi CursorLineNr guifg=" .. colors.copy)
 		cmd("hi ModeMsg guifg=" .. colors.copy)
-		opt.guicursor:remove("r-cr-o:hor20-ModesDelete")
-		opt.guicursor:append("r-cr-o:hor20-ModesCopy")
+		cmd("hi ModesOperator guifg=NONE guibg=NONE")
+		cmd("hi! link ModesOperator ModesCopy")
 	end
 
 	if style == "delete" then
 		cmd("hi CursorLine guibg=" .. dim_colors.delete)
 		cmd("hi CursorLineNr guifg=" .. colors.delete)
 		cmd("hi ModeMsg guifg=" .. colors.delete)
-		opt.guicursor:remove("r-cr-o:hor20-ModesCopy")
-		opt.guicursor:append("r-cr-o:hor20-ModesDelete")
+		cmd("hi ModesOperator guifg=NONE guibg=NONE")
+		cmd("hi! link ModesOperator ModesDelete")
 	end
 
 	if style == "insert" then
@@ -94,7 +94,7 @@ function modes.setup(opts)
 	-- Set guicursor modes
 	opt.guicursor:append("v-sm:block-ModesVisual")
 	opt.guicursor:append("i-ci-ve:ver25-ModesInsert")
-	opt.guicursor:append("r-cr-o:hor20-ModesDelete")
+	opt.guicursor:append("r-cr-o:hor20-ModesOperator")
 
 	vim.register_keystroke_callback(function(key)
 		local current_mode = fn.mode()
