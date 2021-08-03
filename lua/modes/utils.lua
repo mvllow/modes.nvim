@@ -1,12 +1,23 @@
 local utils = {}
 
+-- @test: -1 value (eg. Normal guifg=NONE)
+-- @test: word value (eg. 'blue')
 local function hexToRgb(hex_str)
 	local hex = "[abcdef0-9][abcdef0-9]"
 	local pat = "^#(" .. hex .. ")(" .. hex .. ")(" .. hex .. ")$"
+
 	hex_str = string.lower(hex_str)
 
 	if string.find(hex_str, pat) == nil then
 		hex_str = tostring(vim.api.nvim_get_color_by_name(hex_str))
+		if hex_str == "-1" then
+			if vim.opt.background:get() == "dark" then
+				hex_str = "#282828"
+			else
+				hex_str = "#fefefe"
+			end
+		end
+
 		if hex_str:len() == 3 then
 			hex_str = "#" .. hex_str .. hex_str
 		end
@@ -14,6 +25,8 @@ local function hexToRgb(hex_str)
 			hex_str = "#" .. hex_str
 		end
 	end
+
+	hex_str = string.lower(hex_str)
 
 	assert(string.find(hex_str, pat) ~= nil, "hex_to_rgb: invalid hex_str: " .. tostring(hex_str))
 
