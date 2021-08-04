@@ -8,7 +8,7 @@ local function get_color(color)
 	color = vim.api.nvim_get_color_by_name(color)
 
 	if color == -1 then
-		color = vim.opt.background:get() == "dark" and 000 or 255255255
+		color = vim.opt.background:get() == 'dark' and 000 or 255255255
 	end
 
 	return { get_byte(color, 16), get_byte(color, 8), get_byte(color, 0) }
@@ -26,18 +26,23 @@ function util.blend(fg, bg, alpha)
 		return math.floor(math.min(math.max(0, ret), 255) + 0.5)
 	end
 
-	return string.format("#%02X%02X%02X", blendChannel(1), blendChannel(2), blendChannel(3))
+	return string.format(
+		'#%02X%02X%02X',
+		blendChannel(1),
+		blendChannel(2),
+		blendChannel(3)
+	)
 end
 
 function util.hl(group, color)
-	local fg = color.fg and "guifg=" .. color.fg or "guifg=NONE"
-	local bg = color.bg and "guibg=" .. color.bg or "guibg=NONE"
+	local fg = color.fg and 'guifg=' .. color.fg or 'guifg=NONE'
+	local bg = color.bg and 'guibg=' .. color.bg or 'guibg=NONE'
 
-	local hl = "hi " .. group .. " " .. fg .. " " .. bg
+	local hl = 'hi ' .. group .. ' ' .. fg .. ' ' .. bg
 
 	vim.cmd(hl)
 	if color.link then
-		vim.cmd("hi! link " .. group .. " " .. color.link)
+		vim.cmd('hi! link ' .. group .. ' ' .. color.link)
 	end
 end
 
@@ -47,8 +52,8 @@ function util.get_fg_from_hl(hl_name, fallback)
 		return fallback
 	end
 
-	local foreground = vim.fn.synIDattr(id, "fg")
-	if not foreground or foreground == "" then
+	local foreground = vim.fn.synIDattr(id, 'fg')
+	if not foreground or foreground == '' then
 		return fallback
 	end
 
@@ -61,8 +66,8 @@ function util.get_bg_from_hl(hl_name, fallback)
 		return fallback
 	end
 
-	local background = vim.fn.synIDattr(id, "bg")
-	if not background or background == "" then
+	local background = vim.fn.synIDattr(id, 'bg')
+	if not background or background == '' then
 		return fallback
 	end
 
@@ -75,15 +80,18 @@ end
 
 function util.define_augroups(definitions)
 	for group_name, definition in pairs(definitions) do
-		vim.cmd("augroup " .. group_name)
-		vim.cmd("autocmd!")
+		vim.cmd('augroup ' .. group_name)
+		vim.cmd('autocmd!')
 
 		for _, def in pairs(definition) do
-			local command = table.concat(vim.tbl_flatten({ "autocmd", def }), " ")
+			local command = table.concat(
+				vim.tbl_flatten({ 'autocmd', def }),
+				' '
+			)
 			vim.cmd(command)
 		end
 
-		vim.cmd("augroup END")
+		vim.cmd('augroup END')
 	end
 end
 
