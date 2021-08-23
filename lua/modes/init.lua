@@ -92,6 +92,17 @@ function modes.set_colors()
 	cmd('hi ModesVisual guibg=' .. colors.visual)
 end
 
+---@class Colors
+---@field copy string
+---@field delete string
+---@field insert string
+---@field visual string
+
+---@class Config
+---@field colors Colors
+---@field line_opacity number between 0 and 1
+
+---@param opts Config
 function modes.setup(opts)
 	if opts == nil then
 		opts = {
