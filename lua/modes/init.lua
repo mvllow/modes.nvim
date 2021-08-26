@@ -52,6 +52,12 @@ function modes.set_highlights(style)
 end
 
 function modes.set_colors()
+	init_colors = {
+		cursor_line = util.get_bg_from_hl('CursorLine', 'CursorLine'),
+		cursor_line_nr = util.get_fg_from_hl('CursorLineNr', 'CursorLineNr'),
+		mode_msg = util.get_fg_from_hl('ModeMsg', 'ModeMsg'),
+		normal = util.get_bg_from_hl('Normal', 'Normal'),
+	}
 	colors = {
 		copy = config.colors.copy or util.get_bg_from_hl('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or util.get_bg_from_hl(
@@ -121,13 +127,6 @@ function modes.setup(opts)
 	end
 
 	config = opts
-
-	init_colors = {
-		cursor_line = util.get_bg_from_hl('CursorLine', 'CursorLine'),
-		cursor_line_nr = util.get_fg_from_hl('CursorLineNr', 'CursorLineNr'),
-		mode_msg = util.get_fg_from_hl('ModeMsg', 'ModeMsg'),
-		normal = util.get_bg_from_hl('Normal', 'Normal'),
-	}
 
 	-- Hack to ensure theme colors get loaded properly
 	modes.set_colors()
@@ -199,6 +198,7 @@ function modes.setup(opts)
 
 	util.define_augroups({
 		_modes = {
+			{ 'ColorScheme', '*', 'lua require("modes").set_colors()' },
 			{
 				'InsertEnter',
 				'*',
