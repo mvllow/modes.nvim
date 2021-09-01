@@ -9,7 +9,9 @@ Highlight UI elements based on current mode. Inspired by the recent addition of 
 ```lua
 use({
   'mvllow/modes.nvim',
+  event = 'BufRead', -- optional lazy loading
   config = function()
+    vim.opt.cursorline = true
     require('modes').setup()
   end
 })
