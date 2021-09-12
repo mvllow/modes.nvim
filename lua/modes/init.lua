@@ -112,19 +112,8 @@ end
 function modes.setup(opts)
 	local default = require('modes.config').default
 
-	if not opts or not next(opts) then
-		opts = default
-	end
-	if opts.colors then
-		-- Use default colors
-		-- Overrides highlight groups if any, eg. ModesVisual
-		local mode = { 'copy', 'delete', 'insert', 'visual' }
-		for _, v in ipairs(mode) do
-			opts.colors[v] = opts.colors[v] or default.colors[v]
-		end
-	end
-	opts.line_opacity = opts.line_opacity or default.line_opacity
-
+	-- Set opts with fallback to default.
+	setmetatable(opts or {}, { __index = default })
 	config = opts
 
 	-- Hack to ensure theme colors get loaded properly
