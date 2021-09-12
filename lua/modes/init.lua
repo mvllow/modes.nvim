@@ -110,22 +110,10 @@ end
 
 ---@param opts Config
 function modes.setup(opts)
-	if opts == nil then
-		opts = {
-			colors = {},
-			line_opacity = 0.15,
-		}
-	elseif opts == {} then
-		-- Use default colors
-		-- Overrides highlight groups if any, eg. ModesVisual
-		opts.colors = {
-			copy = '#f5c359',
-			delete = '#c75c6a',
-			insert = '#78ccc5',
-			visual = '#9745be',
-		}
-	end
+	local default = require('modes.config').default
 
+	-- Set opts with fallback to default.
+	setmetatable(opts or {}, { __index = default })
 	config = opts
 
 	-- Hack to ensure theme colors get loaded properly
