@@ -142,7 +142,8 @@ function modes.setup(opts)
 	opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
 	opt.guicursor:append('r-cr-o:hor20-ModesOperator')
 
-	vim.register_keystroke_callback(function(key)
+	local on_key = vim.on_key or vim.register_keystroke_callback
+	on_key(function(key)
 		local current_mode = fn.mode()
 
 		-- Insert mode
