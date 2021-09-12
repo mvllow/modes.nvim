@@ -110,21 +110,20 @@ end
 
 ---@param opts Config
 function modes.setup(opts)
-	if opts == nil then
-		opts = {
-			colors = {},
-			line_opacity = 0.15,
-		}
-	elseif opts == {} then
+	local default = require('modes.config').default
+
+	if not opts or not next(opts) then
+		opts = default
+	end
+	if opts.colors then
 		-- Use default colors
 		-- Overrides highlight groups if any, eg. ModesVisual
-		opts.colors = {
-			copy = '#f5c359',
-			delete = '#c75c6a',
-			insert = '#78ccc5',
-			visual = '#9745be',
-		}
+		local mode = { 'copy', 'delete', 'insert', 'visual' }
+		for _, v in ipairs(mode) do
+			opts.colors[v] = opts.colors[v] or default.colors[v]
+		end
 	end
+	opts.line_opacity = opts.line_opacity or default.line_opacity
 
 	config = opts
 
