@@ -8,6 +8,7 @@ M.default = {
 		visual = '#9745be',
 	},
 	line_opacity = 0.15,
+	focus_only = false,
 }
 
 return M

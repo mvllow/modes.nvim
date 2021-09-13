@@ -185,21 +185,26 @@ function modes.setup(opts)
 		end
 	end)
 
-	util.define_augroups({
-		_modes = {
-			{ 'ColorScheme', '*', 'lua require("modes").set_colors()' },
-			{
-				'InsertEnter',
-				'*',
-				'lua require("modes").set_highlights("insert")',
-			},
-			{
-				'CmdlineLeave,InsertLeave,TextYankPost',
-				'*',
-				'lua require("modes").reset()',
-			},
+	local autocmds = {
+		{ 'ColorScheme', '*', 'lua require("modes").set_colors()' },
+		{
+			'InsertEnter',
+			'*',
+			'lua require("modes").set_highlights("insert")',
 		},
-	})
+		{
+			'CmdlineLeave,InsertLeave,TextYankPost,WinLeave',
+			'*',
+			'lua require("modes").reset()',
+		},
+	}
+
+	if config.focus_only then
+		autocmds['cl'] = { 'WinEnter', '*', 'set cursorline' }
+		autocmds['nocl'] = { 'WinLeave', '*', 'set nocursorline' }
+	end
+
+	util.define_augroups({ _modes = autocmds })
 end
 
 return modes
