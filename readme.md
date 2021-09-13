@@ -34,7 +34,8 @@ require('modes').setup({
     insert = "#78ccc5",
     visual = "#9745be",
   },
-  line_opacity = 0.1
+  line_opacity = 0.1,
+  focus_only = false
 })
 
 -- Or use highlight groups (useful for themes)
@@ -60,5 +61,3 @@ require('which-key').setup({
   },
 })
 ```
-
-- Line highlights are applied to all buffers, not just the active one
