@@ -193,7 +193,7 @@ function modes.setup(opts)
 			'lua require("modes").set_highlights("insert")',
 		},
 		{
-			'CmdlineLeave,InsertLeave,TextYankPost',
+			'CmdlineLeave,InsertLeave,TextYankPost,WinLeave',
 			'*',
 			'lua require("modes").reset()',
 		},
