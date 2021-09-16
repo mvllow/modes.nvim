@@ -124,7 +124,20 @@ function modes.setup(opts)
 
 	-- Set opts with fallback to default.
 	setmetatable(opts or {}, { __index = default })
-	setmetatable(opts.line_opacity or {}, { __index = default.line_opacity })
+	if type(opts.line_opacity) == 'number' then
+		opts.line_opacity = {
+			copy = opts.line_opacity,
+			delete = opts.line_opacity,
+			insert = opts.line_opacity,
+			visual = opts.line_opacity,
+		}
+	else
+		setmetatable(
+			opts.line_opacity or {},
+			{ __index = default.line_opacity }
+		)
+	end
+
 	config = opts
 
 	-- Hack to ensure theme colors get loaded properly
