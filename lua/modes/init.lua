@@ -74,21 +74,25 @@ function modes.set_colors()
 		),
 	}
 	dim_colors = {
-		copy = util.blend(colors.copy, init_colors.normal, config.line_opacity),
+		copy = util.blend(
+			colors.copy,
+			init_colors.normal,
+			config.line_opacity.copy
+		),
 		delete = util.blend(
 			colors.delete,
 			init_colors.normal,
-			config.line_opacity
+			config.line_opacity.delete
 		),
 		insert = util.blend(
 			colors.insert,
 			init_colors.normal,
-			config.line_opacity
+			config.line_opacity.insert
 		),
 		visual = util.blend(
 			colors.visual,
 			init_colors.normal,
-			config.line_opacity
+			config.line_opacity.visual
 		),
 	}
 
@@ -104,9 +108,15 @@ end
 ---@field insert string
 ---@field visual string
 
+---@class Opacity
+---@field copy number between 0 and 1
+---@field delete number between 0 and 1
+---@field insert number between 0 and 1
+---@field visual number between 0 and 1
+
 ---@class Config
 ---@field colors Colors
----@field line_opacity number between 0 and 1
+---@field line_opacity Opacity
 
 ---@param opts Config
 function modes.setup(opts)
@@ -114,6 +124,20 @@ function modes.setup(opts)
 
 	-- Set opts with fallback to default.
 	setmetatable(opts or {}, { __index = default })
+	if type(opts.line_opacity) == 'number' then
+		opts.line_opacity = {
+			copy = opts.line_opacity,
+			delete = opts.line_opacity,
+			insert = opts.line_opacity,
+			visual = opts.line_opacity,
+		}
+	else
+		setmetatable(
+			opts.line_opacity or {},
+			{ __index = default.line_opacity }
+		)
+	end
+
 	config = opts
 
 	-- Hack to ensure theme colors get loaded properly
