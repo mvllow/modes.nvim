@@ -117,25 +117,29 @@ end
 
 ---@param opts Config
 function modes.setup(opts)
-	local default = require('modes.config').default
+	local default_config = {
+		-- Colors intentionally set to {} to prioritise theme values
+		colors = {},
+		line_opacity = 0.15,
+		focus_only = false,
+	}
+	opts = opts or default_config
 
-	-- Set opts with fallback to default.
-	setmetatable(opts or {}, { __index = default })
-	if type(opts.line_opacity) == 'number' then
-		opts.line_opacity = {
-			copy = opts.line_opacity,
-			delete = opts.line_opacity,
-			insert = opts.line_opacity,
-			visual = opts.line_opacity,
+	-- Resolve configs in the following order:
+	-- 1. User config
+	-- 2. Theme highlights if present (eg. ModesCopy)
+	-- 3. Default config
+	config = vim.tbl_deep_extend('force', default_config, opts)
+
+	-- Allow overriding line opacity per colour
+	if type(config.line_opacity) == 'number' then
+		config.line_opacity = {
+			copy = config.line_opacity,
+			delete = config.line_opacity,
+			insert = config.line_opacity,
+			visual = config.line_opacity,
 		}
-	else
-		setmetatable(
-			opts.line_opacity or {},
-			{ __index = default.line_opacity }
-		)
 	end
-
-	config = opts
 
 	-- Hack to ensure theme colors get loaded properly
 	modes.set_colors()
