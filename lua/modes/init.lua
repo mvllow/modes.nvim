@@ -120,7 +120,12 @@ function modes.setup(opts)
 	local default_config = {
 		-- Colors intentionally set to {} to prioritise theme values
 		colors = {},
-		line_opacity = 0.15,
+		line_opacity = {
+			copy = 0.15,
+			delete = 0.15,
+			insert = 0.15,
+			visual = 0.15,
+		},
 		focus_only = false,
 	}
 	opts = opts or default_config
