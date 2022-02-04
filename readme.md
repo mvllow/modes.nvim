@@ -2,7 +2,7 @@
 
 > Prismatic line decorations for the adventurous vim user
 
-Highlight UI elements based on current mode. Inspired by the recent addition of vim bindings in Xcode-beta.
+Highlight UI elements based on current mode. Inspired by the recent addition of vim bindings in Xcode.
 
 ## Usage
 
