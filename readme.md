@@ -9,7 +9,6 @@ Highlight UI elements based on current mode. Inspired by the recent addition of 
 ```lua
 use({
   'mvllow/modes.nvim',
-  event = 'BufRead', -- optional lazy loading
   config = function()
     vim.opt.cursorline = true
     require('modes').setup()
@@ -26,7 +25,6 @@ use({
 Default colors can be overridden by passing values to the setup function or updating highlight groups.
 
 ```lua
--- Pass colors through setup
 require('modes').setup({
   colors = {
     copy = "#f5c359",
@@ -34,11 +32,20 @@ require('modes').setup({
     insert = "#78ccc5",
     visual = "#9745be",
   },
+
+  -- Cursorline highlight opacity
   line_opacity = 0.1,
+
+  -- Highlight cursor
+  set_cursor = true,
+
+  -- Highlight in active window only
   focus_only = false
 })
+```
 
--- Or use highlight groups (useful for themes)
+```lua
+-- Exposed highlight groups, useful for themes
 vim.cmd('hi ModesCopy guibg=#f5c359')
 vim.cmd('hi ModesDelete guibg=#c75c6a')
 vim.cmd('hi ModesInsert guibg=#78ccc5')
@@ -55,7 +62,6 @@ _Workaround:_
 require('which-key').setup({
   plugins = {
     presets = {
-      -- Disable operators
       operators = false,
     },
   },

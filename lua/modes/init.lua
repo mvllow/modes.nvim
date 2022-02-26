@@ -56,7 +56,10 @@ function modes.set_colors()
 		normal = util.get_bg_from_hl('Normal', 'Normal'),
 	}
 	colors = {
-		copy = config.colors.copy or util.get_bg_from_hl('ModesCopy', '#f5c359'),
+		copy = config.colors.copy or util.get_bg_from_hl(
+			'ModesCopy',
+			'#f5c359'
+		),
 		delete = config.colors.delete or util.get_bg_from_hl(
 			'ModesDelete',
 			'#c75c6a'
@@ -114,6 +117,8 @@ end
 ---@class Config
 ---@field colors Colors
 ---@field line_opacity Opacity
+---@field set_cursor boolean
+---@field focus_only boolean
 
 ---@param opts Config
 function modes.setup(opts)
@@ -126,6 +131,7 @@ function modes.setup(opts)
 			insert = 0.15,
 			visual = 0.15,
 		},
+		set_cursor = true,
 		focus_only = false,
 	}
 	opts = opts or default_config
@@ -156,9 +162,11 @@ function modes.setup(opts)
 	vim.cmd('hi Visual guibg=' .. dim_colors.visual)
 
 	-- Set guicursor modes
-	vim.opt.guicursor:append('v-sm:block-ModesVisual')
-	vim.opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
-	vim.opt.guicursor:append('r-cr-o:hor20-ModesOperator')
+	if config.set_cursor then
+		vim.opt.guicursor:append('v-sm:block-ModesVisual')
+		vim.opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
+		vim.opt.guicursor:append('r-cr-o:hor20-ModesOperator')
+	end
 
 	local on_key = vim.on_key or vim.register_keystroke_callback
 	on_key(function(key)
