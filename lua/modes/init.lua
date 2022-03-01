@@ -170,7 +170,10 @@ function modes.setup(opts)
 
 	local on_key = vim.on_key or vim.register_keystroke_callback
 	on_key(function(key)
-		local current_mode = vim.fn.mode()
+		local ok, current_mode = pcall(vim.fn.mode)
+		if not ok then
+			modes.reset()
+		end
 
 		-- Insert mode
 		if current_mode == 'i' then
