@@ -15,13 +15,11 @@ end
 function modes.set_highlights(style)
 	if style == 'init' then
 		vim.cmd('hi CursorLine guibg=' .. init_colors.cursor_line)
-		vim.cmd('hi CursorLineNr guifg=' .. init_colors.cursor_line_nr)
 		vim.cmd('hi ModeMsg guifg=' .. init_colors.mode_msg)
 	end
 
 	if style == 'copy' then
 		vim.cmd('hi CursorLine guibg=' .. dim_colors.copy)
-		vim.cmd('hi CursorLineNr guifg=' .. colors.copy)
 		vim.cmd('hi ModeMsg guifg=' .. colors.copy)
 		vim.cmd('hi ModesOperator guifg=NONE guibg=NONE')
 		vim.cmd('hi! link ModesOperator ModesCopy')
@@ -29,7 +27,6 @@ function modes.set_highlights(style)
 
 	if style == 'delete' then
 		vim.cmd('hi CursorLine guibg=' .. dim_colors.delete)
-		vim.cmd('hi CursorLineNr guifg=' .. colors.delete)
 		vim.cmd('hi ModeMsg guifg=' .. colors.delete)
 		vim.cmd('hi ModesOperator guifg=NONE guibg=NONE')
 		vim.cmd('hi! link ModesOperator ModesDelete')
@@ -37,13 +34,11 @@ function modes.set_highlights(style)
 
 	if style == 'insert' then
 		vim.cmd('hi CursorLine guibg=' .. dim_colors.insert)
-		vim.cmd('hi CursorLineNr guifg=' .. colors.insert)
 		vim.cmd('hi ModeMsg guifg=' .. colors.insert)
 	end
 
 	if style == 'visual' then
 		vim.cmd('hi CursorLine guibg=' .. dim_colors.visual)
-		vim.cmd('hi CursorLineNr guifg=' .. colors.visual)
 		vim.cmd('hi ModeMsg guifg=' .. colors.visual)
 	end
 end
