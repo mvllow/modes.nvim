@@ -2,17 +2,14 @@
 
 > Prismatic line decorations for the adventurous vim user
 
-Highlight UI elements based on current mode. Inspired by the recent addition of vim bindings in Xcode.
-
 ## Usage
 
 ```lua
 use({
-  'mvllow/modes.nvim',
-  config = function()
-    vim.opt.cursorline = true
-    require('modes').setup()
-  end
+	'mvllow/modes.nvim',
+	config = function()
+		require('modes').setup()
+	end
 })
 ```
 
@@ -20,37 +17,42 @@ use({
 
 ## Options
 
-> Note: `vim.opt.cursorline` must be set to true for lines to be highlighted
-
-Default colors can be overridden by passing values to the setup function or updating highlight groups.
-
 ```lua
 require('modes').setup({
-  colors = {
-    copy = "#f5c359",
-    delete = "#c75c6a",
-    insert = "#78ccc5",
-    visual = "#9745be",
-  },
+	colors = {
+		copy = "#f5c359",
+		delete = "#c75c6a",
+		insert = "#78ccc5",
+		visual = "#9745be",
+	},
 
-  -- Cursorline highlight opacity
-  line_opacity = 0.1,
+	-- Set opacity for cursorline and number background
+	line_opacity = 0.15,
 
-  -- Highlight cursor
-  set_cursor = true,
+	-- Enable cursor highlights
+	set_cursor = true,
 
-  -- Highlight in active window only
-  focus_only = false
+	-- Enable cursorline initially, and disable cursorline for inactive windows
+	-- or ignored filetypes
+	set_cursorline = true,
+
+	-- Enable line number highlights to match cursorline
+	set_number = true,
+
+	-- Disable modes highlights in specified filetypes
+	-- Please PR commonly ignored filetypes
+	ignore_filetypes = { 'TelescopePrompt' }
 })
 ```
 
-```lua
--- Exposed highlight groups, useful for themes
-vim.cmd('hi ModesCopy guibg=#f5c359')
-vim.cmd('hi ModesDelete guibg=#c75c6a')
-vim.cmd('hi ModesInsert guibg=#78ccc5')
-vim.cmd('hi ModesVisual guibg=#9745be')
-```
+## Themes
+
+| Highlight group | Default value   |
+| --------------- | --------------- |
+| `ModesCopy`     | `guibg=#f5c359` |
+| `ModesDelete`   | `guibg=#c75c6a` |
+| `ModesInsert`   | `guibg=#78ccc5` |
+| `ModesVisual`   | `guibg=#9745be` |
 
 ## Known issues
 
