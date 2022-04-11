@@ -43,6 +43,26 @@ local get_hl = function(name, fallback)
 	}
 end
 
+---@class Highlight
+---@field bg string
+---@field fg string
+---@field link string
+---@field sp string
+---@field bold boolean
+---@field italic boolean
+---@field reverse boolean
+---@field inverse boolean
+---@field standout boolean
+---@field underline boolean
+---@field underlineline boolean
+---@field undercurl boolean
+---@field underdot boolean
+---@field underdash boolean
+---@field strikethrough boolean
+
+---set highlight
+---@param name string
+---@param opts Highlight
 local set_hl = function(name, opts)
 	if opts.link ~= nil then
 		vim.cmd('hi ' .. name .. ' guibg=none guibg=none')
