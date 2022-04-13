@@ -147,6 +147,30 @@ M.define = function()
 	utils.set_hl('Visual', { bg = blended_colors.visual })
 end
 
+M.enable_managed_ui = function()
+	if config.set_cursor then
+		vim.opt.guicursor:append('v-sm:block-ModesVisual')
+		vim.opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
+		vim.opt.guicursor:append('r-cr-o:hor20-ModesOperator')
+	end
+
+	if config.set_cursorline then
+		vim.opt.cursorline = true
+	end
+end
+
+M.disable_managed_ui = function()
+	if config.set_cursor then
+		vim.opt.guicursor:remove('v-sm:block-ModesVisual')
+		vim.opt.guicursor:remove('i-ci-ve:ver25-ModesInsert')
+		vim.opt.guicursor:remove('r-cr-o:hor20-ModesOperator')
+	end
+
+	if config.set_cursorline then
+		vim.opt.cursorline = false
+	end
+end
+
 M.setup = function(opts)
 	opts = opts or default_config
 
@@ -177,66 +201,36 @@ M.setup = function(opts)
 
 	vim.on_key(function(key)
 		local ok, current_mode = pcall(vim.fn.mode)
-		if not ok then
+		if not ok or key == utils.replace_termcodes('<esc>') then
 			M.reset()
 		end
 
-		if current_mode == 'i' then
-			if key == utils.replace_termcodes('<esc>') then
-				M.reset()
-			end
-		end
-
 		if current_mode == 'n' then
-			if key == utils.replace_termcodes('<esc>') then
-				M.reset()
+			if key == 'y' and not operator_started then
+				M.highlight('copy')
+				operator_started = true
 			end
 
-			if key == 'y' then
-				if operator_started then
-					M.reset()
-				else
-					M.highlight('copy')
-					operator_started = true
-				end
-			end
-
-			if key == 'd' then
-				if operator_started then
-					M.reset()
-				else
-					M.highlight('delete')
-					operator_started = true
-				end
+			if key == 'd' and not operator_started then
+				M.highlight('delete')
+				operator_started = true
 			end
 
 			if (key == 'v' or key == 'V') and not operator_started then
 				M.highlight('visual')
 			end
 		end
-
-		if current_mode == 'v' then
-			if key == utils.replace_termcodes('<esc>') then
-				M.reset()
-			end
-		end
-
-		if current_mode == 'V' then
-			if key == utils.replace_termcodes('<esc>') then
-				M.reset()
-			end
-		end
 	end)
 
 	vim.api.nvim_create_autocmd('ColorScheme', {
 		pattern = '*',
-		callback = require('modes').define,
+		callback = M.define,
 	})
 
 	vim.api.nvim_create_autocmd('InsertEnter', {
 		pattern = '*',
 		callback = function()
-			require('modes').highlight('insert')
+			M.highlight('insert')
 		end,
 	})
 
@@ -244,61 +238,25 @@ M.setup = function(opts)
 		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinLeave' },
 		{
 			pattern = '*',
-			callback = require('modes').reset,
+			callback = M.reset,
 		}
 	)
 
-	if config.set_cursor then
-		vim.opt.guicursor:append('v-sm:block-ModesVisual')
-		vim.opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
-		vim.opt.guicursor:append('r-cr-o:hor20-ModesOperator')
-	end
-
-	if config.set_cursorline then
-		vim.opt.cursorline = true
-	end
+	M.enable_managed_ui()
 
 	vim.api.nvim_create_autocmd('WinEnter', {
 		pattern = '*',
-		callback = function()
-			if config.set_cursor then
-				vim.opt.guicursor:append('v-sm:block-ModesVisual')
-				vim.opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
-				vim.opt.guicursor:append('r-cr-o:hor20-ModesOperator')
-			end
-
-			if config.set_cursorline then
-				vim.opt.cursorline = true
-			end
-		end,
+		callback = M.enable_managed_ui,
 	})
 
 	vim.api.nvim_create_autocmd('WinLeave', {
 		pattern = '*',
-		callback = function()
-			if config.set_cursor then
-				vim.opt.guicursor:remove('v-sm:block-ModesVisual')
-				vim.opt.guicursor:remove('i-ci-ve:ver25-ModesInsert')
-				vim.opt.guicursor:remove('r-cr-o:hor20-ModesOperator')
-			end
-
-			if config.set_cursorline then
-				vim.opt.cursorline = false
-			end
-		end,
+		callback = M.disable_managed_ui,
 	})
 
 	vim.api.nvim_create_autocmd('FileType', {
 		pattern = config.ignore_filetypes,
-		callback = function()
-			vim.opt.guicursor:remove('v-sm:block-ModesVisual')
-			vim.opt.guicursor:remove('i-ci-ve:ver25-ModesInsert')
-			vim.opt.guicursor:remove('r-cr-o:hor20-ModesOperator')
-
-			if config.set_cursorline then
-				vim.opt.cursorline = false
-			end
-		end,
+		callback = M.disable_managed_ui,
 	})
 end
 
