@@ -13,7 +13,7 @@ local default_config = {
 	set_cursor = true,
 	set_cursorline = true,
 	set_number = true,
-	ignore_filetypes = { 'TelescopePrompt' },
+	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' },
 }
 local colors = {}
 local blended_colors = {}
