@@ -201,11 +201,21 @@ M.setup = function(opts)
 
 	vim.on_key(function(key)
 		local ok, current_mode = pcall(vim.fn.mode)
-		if not ok or key == utils.replace_termcodes('<esc>') then
+		if not ok then
 			M.reset()
 		end
 
+		if current_mode == 'i' then
+			if key == utils.replace_termcodes('<esc>') then
+				M.reset()
+			end
+		end
+
 		if current_mode == 'n' then
+			if key == utils.replace_termcodes('<esc>') then
+				M.reset()
+			end
+
 			if key == 'y' and not operator_started then
 				M.highlight('copy')
 				operator_started = true
@@ -218,6 +228,18 @@ M.setup = function(opts)
 
 			if (key == 'v' or key == 'V') and not operator_started then
 				M.highlight('visual')
+			end
+		end
+
+		if current_mode == 'v' then
+			if key == utils.replace_termcodes('<esc>') then
+				M.reset()
+			end
+		end
+
+		if current_mode == 'V' then
+			if key == utils.replace_termcodes('<esc>') then
+				M.reset()
 			end
 		end
 	end)
