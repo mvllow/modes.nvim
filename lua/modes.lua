@@ -73,11 +73,11 @@ end
 
 M.define = function()
 	default_colors = {
-		cursor_line = utils.get_bg('CursorLine', 'CursorLine'),
-		cursor_line_nr = utils.get_bg('CursorLineNr', 'CursorLineNr'),
-		mode_msg = utils.get_fg('ModeMsg', 'ModeMsg'),
-		normal = utils.get_bg('Normal', 'Normal'),
-		visual = utils.get_bg('Visual', 'Visual'),
+		cursor_line = utils.get_bg('CursorLine'),
+		cursor_line_nr = utils.get_bg('CursorLineNr'),
+		mode_msg = utils.get_fg('ModeMsg'),
+		normal = utils.get_bg('Normal'),
+		visual = utils.get_bg('Visual'),
 	}
 	colors = {
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
