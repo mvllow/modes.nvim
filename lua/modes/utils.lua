@@ -1,4 +1,4 @@
-local util = {}
+local M = {}
 
 local function get_byte(value, offset)
 	return bit.band(bit.rshift(value, offset), 0xFF)
@@ -17,7 +17,7 @@ end
 ---@param fg string foreground color
 ---@param bg string background color
 ---@param alpha number number between 0 and 1. 0 results in bg, 1 results in fg
-function util.blend(fg, bg, alpha)
+M.blend = function(fg, bg, alpha)
 	bg = get_color(bg)
 	fg = get_color(fg)
 
@@ -34,7 +34,7 @@ function util.blend(fg, bg, alpha)
 	)
 end
 
-function util.hl(group, color)
+M.hl = function(group, color)
 	local fg = color.fg and 'guifg=' .. color.fg or 'guifg=NONE'
 	local bg = color.bg and 'guibg=' .. color.bg or 'guibg=NONE'
 
@@ -46,7 +46,7 @@ function util.hl(group, color)
 	end
 end
 
-function util.get_fg_from_hl(hl_name, fallback)
+M.get_fg_from_hl = function(hl_name, fallback)
 	local id = vim.api.nvim_get_hl_id_by_name(hl_name)
 	if not id then
 		return fallback
@@ -60,7 +60,7 @@ function util.get_fg_from_hl(hl_name, fallback)
 	return foreground
 end
 
-function util.get_bg_from_hl(hl_name, fallback)
+M.get_bg_from_hl = function(hl_name, fallback)
 	local id = vim.api.nvim_get_hl_id_by_name(hl_name)
 	if not id then
 		return fallback
@@ -74,25 +74,8 @@ function util.get_bg_from_hl(hl_name, fallback)
 	return background
 end
 
-function util.get_termcode(key)
+M.get_termcode = function(key)
 	return vim.api.nvim_replace_termcodes(key, true, true, true)
 end
 
-function util.define_augroups(definitions)
-	for group_name, definition in pairs(definitions) do
-		vim.cmd('augroup ' .. group_name)
-		vim.cmd('autocmd!')
-
-		for _, def in pairs(definition) do
-			local command = table.concat(
-				vim.tbl_flatten({ 'autocmd', def }),
-				' '
-			)
-			vim.cmd(command)
-		end
-
-		vim.cmd('augroup END')
-	end
-end
-
-return util
+return M
