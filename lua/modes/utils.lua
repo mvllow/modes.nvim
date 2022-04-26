@@ -1,53 +1,67 @@
 local M = {}
 
-local function get_byte(value, offset)
-	return bit.band(bit.rshift(value, offset), 0xFF)
-end
-
-local function get_color(color)
-	color = vim.api.nvim_get_color_by_name(color)
-
+---Get normalised colour
+---@param name string like 'pink' or '#fa8072'
+---@return string[]
+local get_color = function(name)
+	local color = vim.api.nvim_get_color_by_name(name)
 	if color == -1 then
 		color = vim.opt.background:get() == 'dark' and 000 or 255255255
 	end
 
-	return { get_byte(color, 16), get_byte(color, 8), get_byte(color, 0) }
+	---Convert colour to hex
+	---@param value integer
+	---@param offset integer
+	---@return integer
+	local byte = function(value, offset)
+		return bit.band(bit.rshift(value, offset), 0xFF)
+	end
+
+	return { byte(color, 16), byte(color, 8), byte(color, 0) }
 end
 
----@param fg string foreground color
----@param bg string background color
----@param alpha number number between 0 and 1. 0 results in bg, 1 results in fg
+---Get visually transparent volour
+---@param fg string like 'pink' or '#fa8072'
+---@param bg string like 'pink' or '#fa8072'
+---@param alpha integer number between 0 and 1
+---@return string
 M.blend = function(fg, bg, alpha)
-	bg = get_color(bg)
-	fg = get_color(fg)
+	local bg_color = get_color(bg)
+	local fg_color = get_color(fg)
 
-	local blendChannel = function(i)
-		local ret = (alpha * fg[i] + ((1 - alpha) * bg[i]))
+	---@param i integer
+	---@return integer
+	local channel = function(i)
+		local ret = (alpha * fg_color[i] + ((1 - alpha) * bg_color[i]))
 		return math.floor(math.min(math.max(0, ret), 255) + 0.5)
 	end
 
-	return string.format(
-		'#%02X%02X%02X',
-		blendChannel(1),
-		blendChannel(2),
-		blendChannel(3)
-	)
+	return string.format('#%02X%02X%02X', channel(1), channel(2), channel(3))
 end
 
-M.hl = function(group, color)
-	local fg = color.fg and 'guifg=' .. color.fg or 'guifg=NONE'
-	local bg = color.bg and 'guibg=' .. color.bg or 'guibg=NONE'
+---@class Color
+---@field bg string
+---@field fg string
+---@field link string
 
-	local hl = 'hi ' .. group .. ' ' .. fg .. ' ' .. bg
-
-	vim.cmd(hl)
-	if color.link then
-		vim.cmd('hi! link ' .. group .. ' ' .. color.link)
+---Set highlight
+---@param name string
+---@param color Color
+M.set_hl = function(name, color)
+	if color.link ~= nil then
+		vim.cmd('hi ' .. name .. ' guibg=none guifg=none')
+		vim.cmd('hi! link ' .. name .. ' ' .. color.link)
+		return
 	end
+
+	local bg = color.bg or 'none'
+	local fg = color.fg or 'none'
+
+	vim.cmd('hi ' .. name .. ' guibg=' .. bg .. ' guifg=' .. fg)
 end
 
-M.get_fg_from_hl = function(hl_name, fallback)
-	local id = vim.api.nvim_get_hl_id_by_name(hl_name)
+M.get_fg = function(name, fallback)
+	local id = vim.api.nvim_get_hl_id_by_name(name)
 	if not id then
 		return fallback
 	end
@@ -60,8 +74,8 @@ M.get_fg_from_hl = function(hl_name, fallback)
 	return foreground
 end
 
-M.get_bg_from_hl = function(hl_name, fallback)
-	local id = vim.api.nvim_get_hl_id_by_name(hl_name)
+M.get_bg = function(name, fallback)
+	local id = vim.api.nvim_get_hl_id_by_name(name)
 	if not id then
 		return fallback
 	end
@@ -74,7 +88,10 @@ M.get_bg_from_hl = function(hl_name, fallback)
 	return background
 end
 
-M.get_termcode = function(key)
+---Replace terminal keycodes
+---@param key string like '<esc>'
+---@return string
+M.replace_termcodes = function(key)
 	return vim.api.nvim_replace_termcodes(key, true, true, true)
 end
 
