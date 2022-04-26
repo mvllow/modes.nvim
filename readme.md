@@ -19,12 +19,12 @@ use({
 
 ```lua
 require('modes').setup({
-  colors = {
-    copy = "#f5c359",
-    delete = "#c75c6a",
-    insert = "#78ccc5",
-    visual = "#9745be",
-  },
+	colors = {
+		copy = "#f5c359",
+		delete = "#c75c6a",
+		insert = "#78ccc5",
+		visual = "#9745be",
+	},
 
 	-- Set opacity for cursorline and number background
 	line_opacity = 0.15,
@@ -62,10 +62,10 @@ _Workaround:_
 
 ```lua
 require('which-key').setup({
-  plugins = {
-    presets = {
-      operators = false,
-    },
-  },
+	plugins = {
+		presets = {
+			operators = false,
+		},
+	},
 })
 ```
