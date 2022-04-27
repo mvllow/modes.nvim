@@ -76,7 +76,7 @@ M.define = function()
 		cursor_line = utils.get_bg('CursorLine'),
 		cursor_line_nr = utils.get_bg('CursorLineNr'),
 		mode_msg = utils.get_fg('ModeMsg'),
-		normal = utils.get_bg('Normal'),
+		normal = utils.get_bg('Normal', 'Normal'),
 		visual = utils.get_bg('Visual'),
 	}
 	colors = {
