@@ -198,18 +198,12 @@ M.setup = function(opts)
 				end
 			end
 
-			if (key == 'v' or key == 'V') and not operator_started then
+			if (key:lower() == 'v' or key == '') and not operator_started then
 				M.highlight('visual')
 			end
 		end
 
-		if current_mode == 'v' then
-			if key == utils.replace_termcodes('<esc>') then
-				M.reset()
-			end
-		end
-
-		if current_mode == 'V' then
+		if current_mode:lower() == 'v' or current_mode == '' then
 			if key == utils.replace_termcodes('<esc>') then
 				M.reset()
 			end
