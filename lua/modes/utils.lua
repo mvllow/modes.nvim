@@ -4,7 +4,10 @@ local M = {}
 ---@param name string like 'pink' or '#fa8072'
 ---@return string[]
 local get_color = function(name)
-	local color = vim.api.nvim_get_color_by_name(name)
+	local color = -1
+	if type(name) == "string" then
+		color = vim.api.nvim_get_color_by_name(name)
+	end
 	if color == -1 then
 		color = vim.opt.background:get() == 'dark' and 000 or 255255255
 	end
