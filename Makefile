@@ -1,5 +1,5 @@
 DEPENDENCIES_DIR:=dependencies
-DEPENDENCIES_VENDOR:="${DEPENDENCIES_DIR}/pack/vendor"
+DEPENDENCIES_VENDOR:=${DEPENDENCIES_DIR}/pack/vendor
 NVIM_HEADLESS:=nvim --headless --noplugin -u tests/minimal.vim
 
 .PHONY: install_dependencies
@@ -15,5 +15,5 @@ clear_dependencies:
 clean: clear_dependencies
 
 .PHONY: test
-test: clean
+test: install_dependencies
 	$(NVIM_HEADLESS) -c "call Test()"
