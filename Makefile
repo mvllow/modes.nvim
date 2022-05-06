@@ -10,12 +10,8 @@ install_dependencies:
 clear_dependencies:
 	rm -rf "${DEPENDENCIES_DIR}"
 
-.PHONY: clean_fixtures
-clean_fixtures:
-	rm -rf "${INSTALL_ROOT_DIRECTORY}"
-
 .PHONY: clean
-clean: clean_fixtures clear_dependencies
+clean: clear_dependencies
 
 .PHONY: test
 test: clean
