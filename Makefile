@@ -16,5 +16,4 @@ clean: clear_dependencies
 
 .PHONY: test
 test: clean
-	echo "$(shell pwd)"
 	$(NVIM_HEADLESS) -c "call Test()"
