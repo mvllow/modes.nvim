@@ -6,7 +6,11 @@ To run tests, refer to the `Makefile` in the root directory of this project. Onc
 make test
 ```
 
-If tests need to be ran repeatedly then using `make clean & make test` is required.
+If there are issues with dependencies then a clean operation can be ran:
+
+```sh
+make clean
+```
 
 # Creating Tests
 
@@ -28,7 +32,7 @@ describe('small test', function()
 end)
 ```
 
-Output from `make test`:
+Example output from `make test`:
 
 ```
 git clone --depth=1 https://github.com/nvim-lua/plenary.nvim.git dependencies/pack/vendor/start/plenary.nvim
