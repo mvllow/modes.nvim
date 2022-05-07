@@ -2,6 +2,7 @@
 set display=lastline
 set directory=""
 set noswapfile
+set termguicolors
 
 let $modes = getcwd()
 let $dependencies = getcwd() .. "/dependencies"
