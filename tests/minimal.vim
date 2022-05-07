@@ -3,10 +3,11 @@ set display=lastline
 set directory=""
 set noswapfile
 
-set rtp+=$VIMRUNTIME
+let $dependencies = "./dependencies"
 
-packadd plenary.nvim
-packadd modes.nvim
+set rtp+=.,$dependencies
+
+runtime! plugin/plenary.vim
 
 function Test() abort
 	lua << EOF
