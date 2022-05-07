@@ -1,6 +1,5 @@
 local modes = require('modes')
 local modes_utils = require('modes.utils')
-local test_utils = require('tests.test_utils')
 
 describe('modes.lua tests:', function()
 	describe('Setup Tests:', function()
