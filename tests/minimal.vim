@@ -3,11 +3,13 @@ set display=lastline
 set directory=""
 set noswapfile
 
-let $dependencies = "./dependencies"
+let $modes = getcwd()
+let $dependencies = getcwd() .. "/dependencies"
 
-set rtp+=.,$dependencies
+set rtp+=$dependencies,$modes
+set packpath=$dependencies
 
-runtime! plugin/plenary.vim
+packloadall
 
 function Test() abort
 	lua << EOF
