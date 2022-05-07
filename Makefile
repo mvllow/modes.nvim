@@ -4,7 +4,7 @@ NVIM_HEADLESS:=nvim --headless --noplugin --clean -u tests/minimal.vim
 
 .PHONY: install_dependencies
 install_dependencies:
-	git clone --depth=1 https://github.com/nvim-lua/plenary.nvim.git ${DEPENDENCIES_VENDOR}/start/plenary.nvim
+	test -r ${DEPENDENCIES_VENDOR}/start/plenary.nvim || git clone --depth=1 https://github.com/nvim-lua/plenary.nvim.git ${DEPENDENCIES_VENDOR}/start/plenary.nvim
 
 .PHONY: clear_dependencies
 clear_dependencies:
