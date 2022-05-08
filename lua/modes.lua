@@ -1,6 +1,10 @@
 local utils = require('modes.utils')
 
 local M = {}
+local State = {
+	set_cursorline_hl = true,
+}
+
 local config = {}
 local default_config = {
 	colors = {},
@@ -38,7 +42,9 @@ M.highlight = function(scene)
 	end
 
 	if scene == 'insert' then
-		utils.set_hl('CursorLine', { bg = blended_colors.insert })
+		if config.set_cursorline and State.set_cursorline_hl then
+			utils.set_hl('CursorLine', { bg = blended_colors.insert })
+		end
 		if config.set_number then
 			utils.set_hl('CursorLineNr', { bg = blended_colors.insert })
 		end
@@ -46,7 +52,9 @@ M.highlight = function(scene)
 	end
 
 	if scene == 'visual' then
-		utils.set_hl('CursorLine', { bg = blended_colors.visual })
+		if config.set_cursorline and State.set_cursorline_hl then
+			utils.set_hl('CursorLine', { bg = blended_colors.visual })
+		end
 		if config.set_number then
 			utils.set_hl('CursorLineNr', { bg = blended_colors.visual })
 		end
@@ -55,7 +63,9 @@ M.highlight = function(scene)
 	end
 
 	if scene == 'copy' then
-		utils.set_hl('CursorLine', { bg = blended_colors.copy })
+		if config.set_cursorline and State.set_cursorline_hl then
+			utils.set_hl('CursorLine', { bg = blended_colors.copy })
+		end
 		if config.set_number then
 			utils.set_hl('CursorLineNr', { bg = blended_colors.copy })
 		end
@@ -63,7 +73,9 @@ M.highlight = function(scene)
 	end
 
 	if scene == 'delete' then
-		utils.set_hl('CursorLine', { bg = blended_colors.delete })
+		if config.set_cursorline and State.set_cursorline_hl then
+			utils.set_hl('CursorLine', { bg = blended_colors.delete })
+		end
 		if config.set_number then
 			utils.set_hl('CursorLineNr', { bg = blended_colors.delete })
 		end
@@ -123,7 +135,7 @@ M.enable_managed_ui = function()
 	end
 
 	if config.set_cursorline then
-		vim.opt.cursorline = true
+		State.set_cursorline_hl = true
 	end
 end
 
@@ -135,7 +147,8 @@ M.disable_managed_ui = function()
 	end
 
 	if config.set_cursorline then
-		vim.opt.cursorline = false
+		State.set_cursorline_hl = false
+		-- vim.opt.cursorline = false
 	end
 end
 
@@ -156,6 +169,10 @@ M.setup = function(opts)
 			insert = config.line_opacity,
 			visual = config.line_opacity,
 		}
+	end
+
+	if config.set_cursorline then
+		vim.opt.cursorline = true
 	end
 
 	M.define()
