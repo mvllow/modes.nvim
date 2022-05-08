@@ -1,11 +1,8 @@
 # Testing
 
-> Refer to the project's `Makefile` for all available options
-
 ## Running Tests
 
 To run tests, refer to the `Makefile` in the root directory of this project. Once there, run `make test` to begin tests.
-
 
 ```sh
 make test
@@ -13,14 +10,13 @@ make test
 
 If there are issues with dependencies then a clean operation can be ran:
 
-
 ```sh
 make clean
 ```
 
 ## Creating Tests
 
-Add new test files to `tests/`, ensuring the filename ends with `spec`. E.g.  `my_test_spec.lua`. This new file will automatically be added to the tests.
+Add new test files to `tests/`, ensuring the filename ends with `spec`. E.g. `my_test_spec.lua`. This new file will automatically be added to the tests.
 
 Example test:
 
@@ -79,4 +75,5 @@ install_dependencies:
 	...
 	git clone --depth=1 https://github.com/MunifTanjim/nui.nvim.git ${DEPENDENCIES_VENDOR}/start/nui.nvim
 ```
+
 To verify all dependencies get installed, run `make install_dependencies`.
