@@ -1,6 +1,11 @@
-# Running Tests
+# Testing
+
+> Refer to the project's `Makefile` for all available options
+
+## Running Tests
 
 To run tests, refer to the `Makefile` in the root directory of this project. Once there, run `make test` to begin tests.
+
 
 ```sh
 make test
@@ -8,22 +13,21 @@ make test
 
 If there are issues with dependencies then a clean operation can be ran:
 
+
 ```sh
 make clean
 ```
 
-# Creating Tests
+## Creating Tests
 
-All tests should be within the `tests/` directory and have `spec` as the last part of the filename, so for example: `my_test_spec.lua`. It will then be automatically added to the tests.
+Add new test files to `tests/`, ensuring the filename ends with `spec`. E.g.  `my_test_spec.lua`. This new file will automatically be added to the tests.
 
-This even works recursively in subdirectories within the `tests/` directory so long as the files are suffixed `spec` like above.
-
-A very small example test:
+Example test:
 
 ```lua
 describe('small test', function()
 	describe('compare text', function()
-		it('it should return true that the the text is the same', function()
+		it('should return true that the the text is the same', function()
 			local text = 'some text'
 
 			assert.are.equal(text, 'some text')
@@ -65,11 +69,9 @@ Errors :        0
 [Process exited 0]
 ```
 
-# Adding Dependencies
+## Adding Dependencies
 
-In the `Makefile` dependencies can be added in the `install_dependencies` section. For instance, if there is a new plugin dependency that needs to be added we can clone it into the dependencies directory.
-
-For example, if [nui.nvim](https://github.com/MunifTanjim/nui.nvim) became a dependency we can add it like so:
+In the `Makefile`, new dependencies can be added under `install_dependencies`:
 
 ```
 .PHONY: install_dependencies
@@ -77,5 +79,4 @@ install_dependencies:
 	...
 	git clone --depth=1 https://github.com/MunifTanjim/nui.nvim.git ${DEPENDENCIES_VENDOR}/start/nui.nvim
 ```
-
-To verify if the dependency gets installed properly, run `make install_dependencies` which will show git cloning the repositories under `install_dependencies`
+To verify all dependencies get installed, run `make install_dependencies`.
