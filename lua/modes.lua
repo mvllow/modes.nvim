@@ -80,16 +80,9 @@ M.define = function()
 	vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
-		local cursorline = ('Modes%sCursorLine'):format(mode)
-		local cursorline_nr = ('Modes%sCursorLineNr'):format(mode)
-		utils.set_hl_if_not_exist(
-			cursorline,
-			{ bg = blended_colors[mode:lower()] }
-		)
-		utils.set_hl_if_not_exist(
-			cursorline_nr,
-			{ bg = blended_colors[mode:lower()] }
-		)
+		local def = { bg = blended_colors[mode:lower()] }
+		utils.set_hl_if_not_exist(('Modes%sCursorLine'):format(mode), def)
+		utils.set_hl_if_not_exist(('Modes%sCursorLineNr'):format(mode), def)
 	end
 
 	utils.set_hl('ModeMsgInsert', { fg = colors.insert })
