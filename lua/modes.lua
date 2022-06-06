@@ -168,6 +168,10 @@ M.setup = function(opts)
 				end
 			end
 
+			if key == utils.replace_termcodes('<c-w>') then
+				operator_started = true
+			end
+
 			if
 				(key:lower() == 'v' or key == utils.replace_termcodes('<c-v>'))
 				and not operator_started
