@@ -60,6 +60,14 @@ M.set_hl = function(name, color)
 	vim.cmd('hi ' .. name .. ' guibg=' .. bg .. ' guifg=' .. fg)
 end
 
+M.set_hl_if_not_exist = function (name, color)
+	if pcall(vim.api.nvim_get_hl_by_name, name, true) then
+		return
+	end
+
+	M.set_hl(name, color)
+end
+
 M.get_fg = function(name, fallback)
 	local id = vim.api.nvim_get_hl_id_by_name(name)
 	if not id then

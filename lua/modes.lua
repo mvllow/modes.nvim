@@ -15,9 +15,29 @@ local default_config = {
 	set_number = true,
 	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' },
 }
+local winhighlight = {
+	copy = {
+		'CursorLine:ModesCopyCursorLine',
+		'CursorLineNr:ModesCopyCursorLineNr',
+	},
+	insert = {
+		'CursorLine:ModesInsertCursorLine',
+		'CursorLineNr:ModesInsertCursorLineNr',
+		'ModeMsg:ModeMsgInsert',
+	},
+	delete = {
+		'CursorLine:ModesDeleteCursorLine',
+		'CursorLineNr:ModesDeleteCursorLineNr',
+	},
+	visual = {
+		'CursorLine:ModesVisualCursorLine',
+		'CursorLineNr:ModesVisualCursorLineNr',
+		'ModeMsg:ModeMsgVisual',
+		'Visual:VisualVisual',
+	},
+}
 local colors = {}
 local blended_colors = {}
-local default_colors = {}
 local operator_started = false
 
 M.reset = function()
@@ -28,57 +48,20 @@ end
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
-	if scene == 'default' then
-		utils.set_hl('CursorLine', { bg = default_colors.cursor_line })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = default_colors.cursor_line_nr })
-		end
-		utils.set_hl('ModeMsg', { fg = default_colors.mode_msg })
-		utils.set_hl('Visual', { bg = default_colors.visual })
-	end
-
-	if scene == 'insert' then
-		utils.set_hl('CursorLine', { bg = blended_colors.insert })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.insert })
-		end
-		utils.set_hl('ModeMsg', { fg = colors.insert })
-	end
-
-	if scene == 'visual' then
-		utils.set_hl('CursorLine', { bg = blended_colors.visual })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.visual })
-		end
-		utils.set_hl('ModeMsg', { fg = colors.visual })
-		utils.set_hl('Visual', { bg = blended_colors.visual })
+	if scene == 'delete' then
+		utils.set_hl('ModesOperator', { link = 'ModesDelete' })
 	end
 
 	if scene == 'copy' then
-		utils.set_hl('CursorLine', { bg = blended_colors.copy })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.copy })
-		end
 		utils.set_hl('ModesOperator', { link = 'ModesCopy' })
 	end
 
-	if scene == 'delete' then
-		utils.set_hl('CursorLine', { bg = blended_colors.delete })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.delete })
-		end
-		utils.set_hl('ModesOperator', { link = 'ModesDelete' })
-	end
+	local value = table.concat(winhighlight[scene] or {}, ',')
+	vim.api.nvim_win_set_option(0, 'winhighlight', value)
 end
 
 M.define = function()
-	default_colors = {
-		cursor_line = utils.get_bg('CursorLine', 'CursorLine'),
-		cursor_line_nr = utils.get_bg('CursorLineNr', 'CursorLineNr'),
-		mode_msg = utils.get_fg('ModeMsg', 'ModeMsg'),
-		normal = utils.get_bg('Normal', 'Normal'),
-		visual = utils.get_bg('Visual', 'Visual'),
-	}
+	local base = utils.get_bg('Normal', 'Normal')
 	colors = {
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
@@ -86,26 +69,10 @@ M.define = function()
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	blended_colors = {
-		copy = utils.blend(
-			colors.copy,
-			default_colors.normal,
-			config.line_opacity.copy
-		),
-		delete = utils.blend(
-			colors.delete,
-			default_colors.normal,
-			config.line_opacity.delete
-		),
-		insert = utils.blend(
-			colors.insert,
-			default_colors.normal,
-			config.line_opacity.insert
-		),
-		visual = utils.blend(
-			colors.visual,
-			default_colors.normal,
-			config.line_opacity.visual
-		),
+		copy = utils.blend(colors.copy, base, config.line_opacity.copy),
+		delete = utils.blend(colors.delete, base, config.line_opacity.delete),
+		insert = utils.blend(colors.insert, base, config.line_opacity.insert),
+		visual = utils.blend(colors.visual, base, config.line_opacity.visual),
 	}
 
 	---Create highlight groups
@@ -113,6 +80,23 @@ M.define = function()
 	vim.cmd('hi ModesDelete guibg=' .. colors.delete)
 	vim.cmd('hi ModesInsert guibg=' .. colors.insert)
 	vim.cmd('hi ModesVisual guibg=' .. colors.visual)
+
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
+		local cursorline = ('Modes%sCursorLine'):format(mode)
+		local cursorline_nr = ('Modes%sCursorLineNr'):format(mode)
+		utils.set_hl_if_not_exist(
+			cursorline,
+			{ bg = blended_colors[mode:lower()] }
+		)
+		utils.set_hl_if_not_exist(
+			cursorline_nr,
+			{ bg = blended_colors[mode:lower()] }
+		)
+	end
+
+	utils.set_hl('ModeMsgInsert', { fg = colors.insert })
+	utils.set_hl('ModeMsgVisual', { fg = colors.visual })
+	utils.set_hl('VisualVisual', { bg = blended_colors.visual })
 end
 
 M.enable_managed_ui = function()
@@ -157,11 +141,6 @@ M.setup = function(opts)
 			visual = config.line_opacity,
 		}
 	end
-
-	M.define()
-	vim.defer_fn(function()
-		M.define()
-	end, 15)
 
 	vim.on_key(function(key)
 		local ok, current_mode = pcall(vim.fn.mode)
