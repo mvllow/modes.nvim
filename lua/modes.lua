@@ -51,10 +51,12 @@ M.highlight = function(scene)
 	local value = table.concat(winhighlight[scene] or {}, ',')
 	vim.api.nvim_win_set_option(0, 'winhighlight', value)
 
-	if scene == 'delete' then
-		utils.set_hl('ModesOperator', { link = 'ModesDelete' })
-	elseif scene == 'copy' then
-		utils.set_hl('ModesOperator', { link = 'ModesCopy' })
+	if config.set_cursor then
+		if scene == 'delete' then
+			utils.set_hl('ModesOperator', { link = 'ModesDelete' })
+		elseif scene == 'copy' then
+			utils.set_hl('ModesOperator', { link = 'ModesCopy' })
+		end
 	end
 end
 
