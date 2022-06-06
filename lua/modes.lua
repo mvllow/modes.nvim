@@ -48,16 +48,14 @@ end
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
-	if scene == 'delete' then
-		utils.set_hl('ModesOperator', { link = 'ModesDelete' })
-	end
-
-	if scene == 'copy' then
-		utils.set_hl('ModesOperator', { link = 'ModesCopy' })
-	end
-
 	local value = table.concat(winhighlight[scene] or {}, ',')
 	vim.api.nvim_win_set_option(0, 'winhighlight', value)
+
+	if scene == 'delete' then
+		utils.set_hl('ModesOperator', { link = 'ModesDelete' })
+	elseif scene == 'copy' then
+		utils.set_hl('ModesOperator', { link = 'ModesCopy' })
+	end
 end
 
 M.define = function()
