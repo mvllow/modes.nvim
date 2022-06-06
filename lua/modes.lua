@@ -173,10 +173,15 @@ M.setup = function(opts)
 			end
 
 			if
-				(key:lower() == 'v' or key == utils.replace_termcodes('<c-v>'))
-				and not operator_started
+				key:lower() == 'v'
+				or key == utils.replace_termcodes('<c-v>')
 			then
-				M.highlight('visual')
+				if operator_started then
+					M.reset()
+				else
+					M.highlight('visual')
+					operator_started = true
+				end
 			end
 		end
 
@@ -184,7 +189,10 @@ M.setup = function(opts)
 			current_mode:lower() == 'v'
 			or current_mode == utils.replace_termcodes('<c-v>')
 		then
-			if key == utils.replace_termcodes('<esc>') then
+			if
+				key == utils.replace_termcodes('<esc>')
+				or key == current_mode
+			then
 				M.reset()
 			end
 		end
