@@ -83,8 +83,8 @@ M.define = function()
 
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
 		local def = { bg = blended_colors[mode:lower()] }
-		utils.set_hl_if_not_exist(('Modes%sCursorLine'):format(mode), def)
-		utils.set_hl_if_not_exist(('Modes%sCursorLineNr'):format(mode), def)
+		utils.set_hl(('Modes%sCursorLine'):format(mode), def, true)
+		utils.set_hl(('Modes%sCursorLineNr'):format(mode), def, true)
 	end
 
 	utils.set_hl('ModeMsgInsert', { fg = colors.insert })
