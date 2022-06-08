@@ -16,24 +16,30 @@ local default_config = {
 	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' },
 }
 local winhighlight = {
+	default = {
+		CursorLine = 'CursorLine',
+		CursorLineNr = 'CursorLineNr',
+		ModeMsg = 'ModeMsg',
+		Visual = 'Visual',
+	},
 	copy = {
-		'CursorLine:ModesCopyCursorLine',
-		'CursorLineNr:ModesCopyCursorLineNr',
+		CursorLine = 'ModesCopyCursorLine',
+		CursorLineNr = 'ModesCopyCursorLineNr',
 	},
 	insert = {
-		'CursorLine:ModesInsertCursorLine',
-		'CursorLineNr:ModesInsertCursorLineNr',
-		'ModeMsg:ModeMsgInsert',
+		CursorLine = 'ModesInsertCursorLine',
+		CursorLineNr = 'ModesInsertCursorLineNr',
+		ModeMsg = 'ModeMsgInsert',
 	},
 	delete = {
-		'CursorLine:ModesDeleteCursorLine',
-		'CursorLineNr:ModesDeleteCursorLineNr',
+		CursorLine = 'ModesDeleteCursorLine',
+		CursorLineNr = 'ModesDeleteCursorLineNr',
 	},
 	visual = {
-		'CursorLine:ModesVisualCursorLine',
-		'CursorLineNr:ModesVisualCursorLineNr',
-		'ModeMsg:ModeMsgVisual',
-		'Visual:VisualVisual',
+		CursorLine = 'ModesVisualCursorLine',
+		CursorLineNr = 'ModesVisualCursorLineNr',
+		ModeMsg = 'ModeMsgVisual',
+		Visual = 'VisualVisual',
 	},
 }
 local colors = {}
@@ -48,8 +54,27 @@ end
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
-	local value = table.concat(winhighlight[scene] or {}, ',')
-	vim.api.nvim_win_set_option(0, 'winhighlight', value)
+	local winhl_map = {}
+	local old_value = vim.api.nvim_win_get_option(0, 'winhighlight')
+
+	-- mapping the old value of 'winhighlight'
+	if old_value ~= '' then
+		for _, winhl in ipairs(vim.split(old_value, ',')) do
+			local pair = vim.split(winhl, ':')
+			winhl_map[pair[1]] = pair[2]
+		end
+	end
+
+	-- overrides 'builtin':'hl' if the current scene has a mapping for it
+	for builtin, hl in pairs(winhighlight[scene]) do
+		winhl_map[builtin] = hl
+	end
+
+	local new_value = {}
+	for builtin, hl in pairs(winhl_map) do
+		table.insert(new_value, ('%s:%s'):format(builtin, hl))
+	end
+	vim.api.nvim_win_set_option(0, 'winhighlight', table.concat(new_value, ','))
 
 	if config.set_cursor then
 		if scene == 'delete' then
