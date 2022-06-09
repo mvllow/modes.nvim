@@ -29,7 +29,7 @@ local winhighlight = {
 	insert = {
 		CursorLine = 'ModesInsertCursorLine',
 		CursorLineNr = 'ModesInsertCursorLineNr',
-		ModeMsg = 'ModeMsgInsert',
+		ModeMsg = 'ModesInsertModeMsg',
 	},
 	delete = {
 		CursorLine = 'ModesDeleteCursorLine',
@@ -38,8 +38,8 @@ local winhighlight = {
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
-		ModeMsg = 'ModeMsgVisual',
-		Visual = 'VisualVisual',
+		ModeMsg = 'ModesVisualModeMsg',
+		Visual = 'ModesVisualVisual',
 	},
 }
 local colors = {}
@@ -55,11 +55,11 @@ end
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
 	local winhl_map = {}
-	local old_value = vim.api.nvim_win_get_option(0, 'winhighlight')
+	local prev_value = vim.api.nvim_win_get_option(0, 'winhighlight')
 
 	-- mapping the old value of 'winhighlight'
-	if old_value ~= '' then
-		for _, winhl in ipairs(vim.split(old_value, ',')) do
+	if prev_value ~= '' then
+		for _, winhl in ipairs(vim.split(prev_value, ',')) do
 			local pair = vim.split(winhl, ':')
 			winhl_map[pair[1]] = pair[2]
 		end
@@ -86,7 +86,7 @@ M.highlight = function(scene)
 end
 
 M.define = function()
-	local base = utils.get_bg('Normal', 'Normal')
+	local normal_bg = utils.get_bg('Normal', 'Normal')
 	colors = {
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
@@ -94,10 +94,22 @@ M.define = function()
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	blended_colors = {
-		copy = utils.blend(colors.copy, base, config.line_opacity.copy),
-		delete = utils.blend(colors.delete, base, config.line_opacity.delete),
-		insert = utils.blend(colors.insert, base, config.line_opacity.insert),
-		visual = utils.blend(colors.visual, base, config.line_opacity.visual),
+		copy = utils.blend(colors.copy, normal_bg, config.line_opacity.copy),
+		delete = utils.blend(
+			colors.delete,
+			normal_bg,
+			config.line_opacity.delete
+		),
+		insert = utils.blend(
+			colors.insert,
+			normal_bg,
+			config.line_opacity.insert
+		),
+		visual = utils.blend(
+			colors.visual,
+			normal_bg,
+			config.line_opacity.visual
+		),
 	}
 
 	---Create highlight groups
@@ -112,9 +124,9 @@ M.define = function()
 		utils.set_hl(('Modes%sCursorLineNr'):format(mode), def, true)
 	end
 
-	utils.set_hl('ModeMsgInsert', { fg = colors.insert })
-	utils.set_hl('ModeMsgVisual', { fg = colors.visual })
-	utils.set_hl('VisualVisual', { bg = blended_colors.visual })
+	utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
+	utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
+	utils.set_hl('ModesVisualVisual', { bg = blended_colors.visual })
 end
 
 M.enable_managed_ui = function()
