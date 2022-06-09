@@ -19,7 +19,6 @@ local winhighlight = {
 	default = {
 		CursorLine = 'CursorLine',
 		CursorLineNr = 'CursorLineNr',
-		ModeMsg = 'ModeMsg',
 		Visual = 'Visual',
 	},
 	copy = {
@@ -29,7 +28,6 @@ local winhighlight = {
 	insert = {
 		CursorLine = 'ModesInsertCursorLine',
 		CursorLineNr = 'ModesInsertCursorLineNr',
-		ModeMsg = 'ModesInsertModeMsg',
 	},
 	delete = {
 		CursorLine = 'ModesDeleteCursorLine',
@@ -38,7 +36,6 @@ local winhighlight = {
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
-		ModeMsg = 'ModesVisualModeMsg',
 		Visual = 'ModesVisualVisual',
 	},
 }
@@ -75,6 +72,14 @@ M.highlight = function(scene)
 		table.insert(new_value, ('%s:%s'):format(builtin, hl))
 	end
 	vim.api.nvim_win_set_option(0, 'winhighlight', table.concat(new_value, ','))
+
+	if vim.api.nvim_get_option('showmode') then
+		if scene == 'visual' then
+			utils.set_hl('ModeMsg', { link = 'ModesVisualModeMsg' })
+		elseif scene == 'insert' then
+			utils.set_hl('ModeMsg', { link = 'ModesInsertModeMsg' })
+		end
+	end
 
 	if config.set_cursor then
 		if scene == 'delete' then
