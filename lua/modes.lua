@@ -177,6 +177,8 @@ M.setup = function(opts)
 		}
 	end
 
+	M.define()
+
 	vim.on_key(function(key)
 		local ok, current_mode = pcall(vim.fn.mode)
 		if not ok then
