@@ -15,9 +15,32 @@ local default_config = {
 	set_number = true,
 	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' },
 }
+local winhighlight = {
+	default = {
+		CursorLine = 'CursorLine',
+		CursorLineNr = 'CursorLineNr',
+		Visual = 'Visual',
+	},
+	copy = {
+		CursorLine = 'ModesCopyCursorLine',
+		CursorLineNr = 'ModesCopyCursorLineNr',
+	},
+	insert = {
+		CursorLine = 'ModesInsertCursorLine',
+		CursorLineNr = 'ModesInsertCursorLineNr',
+	},
+	delete = {
+		CursorLine = 'ModesDeleteCursorLine',
+		CursorLineNr = 'ModesDeleteCursorLineNr',
+	},
+	visual = {
+		CursorLine = 'ModesVisualCursorLine',
+		CursorLineNr = 'ModesVisualCursorLineNr',
+		Visual = 'ModesVisualVisual',
+	},
+}
 local colors = {}
 local blended_colors = {}
-local default_colors = {}
 local operator_started = false
 
 M.reset = function()
@@ -28,57 +51,47 @@ end
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
-	if scene == 'default' then
-		utils.set_hl('CursorLine', { bg = default_colors.cursor_line })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = default_colors.cursor_line_nr })
+	local winhl_map = {}
+	local prev_value = vim.api.nvim_win_get_option(0, 'winhighlight')
+
+	-- mapping the old value of 'winhighlight'
+	if prev_value ~= '' then
+		for _, winhl in ipairs(vim.split(prev_value, ',')) do
+			local pair = vim.split(winhl, ':')
+			winhl_map[pair[1]] = pair[2]
 		end
-		utils.set_hl('ModeMsg', { fg = default_colors.mode_msg })
-		utils.set_hl('Visual', { bg = default_colors.visual })
 	end
 
-	if scene == 'insert' then
-		utils.set_hl('CursorLine', { bg = blended_colors.insert })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.insert })
-		end
-		utils.set_hl('ModeMsg', { fg = colors.insert })
+	-- overrides 'builtin':'hl' if the current scene has a mapping for it
+	for builtin, hl in pairs(winhighlight[scene]) do
+		winhl_map[builtin] = hl
 	end
 
-	if scene == 'visual' then
-		utils.set_hl('CursorLine', { bg = blended_colors.visual })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.visual })
+	local new_value = {}
+	for builtin, hl in pairs(winhl_map) do
+		table.insert(new_value, ('%s:%s'):format(builtin, hl))
+	end
+	vim.api.nvim_win_set_option(0, 'winhighlight', table.concat(new_value, ','))
+
+	if vim.api.nvim_get_option('showmode') then
+		if scene == 'visual' then
+			utils.set_hl('ModeMsg', { link = 'ModesVisualModeMsg' })
+		elseif scene == 'insert' then
+			utils.set_hl('ModeMsg', { link = 'ModesInsertModeMsg' })
 		end
-		utils.set_hl('ModeMsg', { fg = colors.visual })
-		utils.set_hl('Visual', { bg = blended_colors.visual })
 	end
 
-	if scene == 'copy' then
-		utils.set_hl('CursorLine', { bg = blended_colors.copy })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.copy })
+	if config.set_cursor then
+		if scene == 'delete' then
+			utils.set_hl('ModesOperator', { link = 'ModesDelete' })
+		elseif scene == 'copy' then
+			utils.set_hl('ModesOperator', { link = 'ModesCopy' })
 		end
-		utils.set_hl('ModesOperator', { link = 'ModesCopy' })
-	end
-
-	if scene == 'delete' then
-		utils.set_hl('CursorLine', { bg = blended_colors.delete })
-		if config.set_number then
-			utils.set_hl('CursorLineNr', { bg = blended_colors.delete })
-		end
-		utils.set_hl('ModesOperator', { link = 'ModesDelete' })
 	end
 end
 
 M.define = function()
-	default_colors = {
-		cursor_line = utils.get_bg('CursorLine', 'CursorLine'),
-		cursor_line_nr = utils.get_bg('CursorLineNr', 'CursorLineNr'),
-		mode_msg = utils.get_fg('ModeMsg', 'ModeMsg'),
-		normal = utils.get_bg('Normal', 'Normal'),
-		visual = utils.get_bg('Visual', 'Visual'),
-	}
+	local normal_bg = utils.get_bg('Normal', 'Normal')
 	colors = {
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
@@ -86,24 +99,20 @@ M.define = function()
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	blended_colors = {
-		copy = utils.blend(
-			colors.copy,
-			default_colors.normal,
-			config.line_opacity.copy
-		),
+		copy = utils.blend(colors.copy, normal_bg, config.line_opacity.copy),
 		delete = utils.blend(
 			colors.delete,
-			default_colors.normal,
+			normal_bg,
 			config.line_opacity.delete
 		),
 		insert = utils.blend(
 			colors.insert,
-			default_colors.normal,
+			normal_bg,
 			config.line_opacity.insert
 		),
 		visual = utils.blend(
 			colors.visual,
-			default_colors.normal,
+			normal_bg,
 			config.line_opacity.visual
 		),
 	}
@@ -113,6 +122,16 @@ M.define = function()
 	vim.cmd('hi ModesDelete guibg=' .. colors.delete)
 	vim.cmd('hi ModesInsert guibg=' .. colors.insert)
 	vim.cmd('hi ModesVisual guibg=' .. colors.visual)
+
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
+		local def = { bg = blended_colors[mode:lower()] }
+		utils.set_hl(('Modes%sCursorLine'):format(mode), def, true)
+		utils.set_hl(('Modes%sCursorLineNr'):format(mode), def, true)
+	end
+
+	utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
+	utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
+	utils.set_hl('ModesVisualVisual', { bg = blended_colors.visual })
 end
 
 M.enable_managed_ui = function()
@@ -159,9 +178,6 @@ M.setup = function(opts)
 	end
 
 	M.define()
-	vim.defer_fn(function()
-		M.define()
-	end, 15)
 
 	vim.on_key(function(key)
 		local ok, current_mode = pcall(vim.fn.mode)
@@ -198,11 +214,20 @@ M.setup = function(opts)
 				end
 			end
 
+			if key == utils.replace_termcodes('<c-w>') then
+				operator_started = true
+			end
+
 			if
-				(key:lower() == 'v' or key == utils.replace_termcodes('<c-v>'))
-				and not operator_started
+				key:lower() == 'v'
+				or key == utils.replace_termcodes('<c-v>')
 			then
-				M.highlight('visual')
+				if operator_started then
+					M.reset()
+				else
+					M.highlight('visual')
+					operator_started = true
+				end
 			end
 		end
 
@@ -210,7 +235,10 @@ M.setup = function(opts)
 			current_mode:lower() == 'v'
 			or current_mode == utils.replace_termcodes('<c-v>')
 		then
-			if key == utils.replace_termcodes('<esc>') then
+			if
+				key == utils.replace_termcodes('<esc>')
+				or key == current_mode
+			then
 				M.reset()
 			end
 		end
