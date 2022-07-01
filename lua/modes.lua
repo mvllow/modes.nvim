@@ -19,23 +19,33 @@ local winhighlight = {
 	default = {
 		CursorLine = 'CursorLine',
 		CursorLineNr = 'CursorLineNr',
+		CursorLineSign = 'CursorLineSign',
+		CursorLineFold = 'CursorLineFold',
 		Visual = 'Visual',
 	},
 	copy = {
 		CursorLine = 'ModesCopyCursorLine',
 		CursorLineNr = 'ModesCopyCursorLineNr',
+		CursorLineSign = 'ModesCopyCursorLineSign',
+		CursorLineFold = 'ModesCopyCursorLineFold',
 	},
 	insert = {
 		CursorLine = 'ModesInsertCursorLine',
 		CursorLineNr = 'ModesInsertCursorLineNr',
+		CursorLineSign = 'ModesInsertCursorLineSign',
+		CursorLineFold = 'ModesInsertCursorLineFold',
 	},
 	delete = {
 		CursorLine = 'ModesDeleteCursorLine',
 		CursorLineNr = 'ModesDeleteCursorLineNr',
+		CursorLineSign = 'ModesDeleteCursorLineSign',
+		CursorLineFold = 'ModesDeleteCursorLineFold',
 	},
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
+		CursorLineSign = 'ModesVisualCursorLineSign',
+		CursorLineFold = 'ModesVisualCursorLineFold',
 		Visual = 'ModesVisualVisual',
 	},
 }
@@ -127,6 +137,8 @@ M.define = function()
 		local def = { bg = blended_colors[mode:lower()] }
 		utils.set_hl(('Modes%sCursorLine'):format(mode), def, true)
 		utils.set_hl(('Modes%sCursorLineNr'):format(mode), def, true)
+		utils.set_hl(('Modes%sCursorLineSign'):format(mode), def, true)
+		utils.set_hl(('Modes%sCursorLineFold'):format(mode), def, true)
 	end
 
 	utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
