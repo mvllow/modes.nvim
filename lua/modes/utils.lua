@@ -47,8 +47,7 @@ end
 ---Set highlight
 ---@param name string
 ---@param color Color
----@param if_not_exists? boolean
-M.set_hl = function(name, color, if_not_exists)
+M.set_hl = function(name, color)
 	if color.link ~= nil then
 		vim.cmd('hi ' .. name .. ' guibg=none guifg=none')
 		vim.cmd('hi! link ' .. name .. ' ' .. color.link)
@@ -58,13 +57,7 @@ M.set_hl = function(name, color, if_not_exists)
 	local bg = color.bg or 'none'
 	local fg = color.fg or 'none'
 
-	if if_not_exists then
-		if pcall(vim.api.nvim_get_hl_by_name, name, true) then
-			return
-		end
-	end
-
-	vim.cmd('hi ' .. name .. ' guibg=' .. bg .. ' guifg=' .. fg)
+	vim.cmd('hi default ' .. name .. ' guibg=' .. bg .. ' guifg=' .. fg)
 end
 
 M.get_fg = function(name, fallback)
