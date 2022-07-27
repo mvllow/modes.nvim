@@ -13,7 +13,7 @@ local default_config = {
 	set_cursor = true,
 	set_cursorline = true,
 	set_number = true,
-	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' },
+	ignore_filetypes = { 'neo-tree', 'NvimTree', 'TelescopePrompt' },
 }
 local winhighlight = {
 	default = {
@@ -159,6 +159,10 @@ M.enable_managed_ui = function()
 end
 
 M.disable_managed_ui = function()
+	if vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype) then
+		return
+	end
+
 	if config.set_cursor then
 		vim.opt.guicursor:remove('v-sm:block-ModesVisual')
 		vim.opt.guicursor:remove('i-ci-ve:ver25-ModesInsert')
