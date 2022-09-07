@@ -195,50 +195,48 @@ M.setup = function(opts)
 		local ok, current_mode = pcall(vim.fn.mode)
 		if not ok then
 			M.reset()
-		else
-			if current_mode == 'i' then
-				if key == utils.replace_termcodes('<esc>') then
-					M.reset()
-					return
-				end
-			end
+			return
+		end
 
-			if current_mode == 'n' then
-				-- reset if coming back from operator pending mode
-				if operator_started then
-					M.reset()
-					return
-				end
-
-				if key == 'y' then
-					M.highlight('copy')
-					operator_started = true
-					return
-				end
-
-				if key == 'd' then
-					M.highlight('delete')
-					operator_started = true
-					return
-				end
-
-				if
-					key:lower() == 'v'
-					or key == utils.replace_termcodes('<c-v>')
-				then
-					M.highlight('visual')
-					operator_started = true
-					return
-				end
-			end
-
-			if
-				key == utils.replace_termcodes('<esc>')
-				or key == current_mode
-			then
+		if current_mode == 'i' then
+			if key == utils.replace_termcodes('<esc>') then
 				M.reset()
 				return
 			end
+		end
+
+		if current_mode == 'n' then
+			-- reset if coming back from operator pending mode
+			if operator_started then
+				M.reset()
+				return
+			end
+
+			if key == 'y' then
+				M.highlight('copy')
+				operator_started = true
+				return
+			end
+
+			if key == 'd' then
+				M.highlight('delete')
+				operator_started = true
+				return
+			end
+
+			if
+				key:lower() == 'v'
+				or key == utils.replace_termcodes('<c-v>')
+			then
+				M.highlight('visual')
+				operator_started = true
+				return
+			end
+		end
+
+		if key == utils.replace_termcodes('<esc>') or key == current_mode then
+			M.reset()
+			return
 		end
 	end)
 
