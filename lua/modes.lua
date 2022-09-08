@@ -223,18 +223,9 @@ M.setup = function(opts)
 				operator_started = true
 				return
 			end
-
-			if
-				key:lower() == 'v'
-				or key == utils.replace_termcodes('<c-v>')
-			then
-				M.highlight('visual')
-				operator_started = true
-				return
-			end
 		end
 
-		if key == utils.replace_termcodes('<esc>') or key == current_mode then
+		if key == utils.replace_termcodes('<esc>') then
 			M.reset()
 			return
 		end
@@ -254,9 +245,17 @@ M.setup = function(opts)
 		end,
 	})
 
+	---Set visual highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:[vV\x16]',
+		callback = function()
+			M.highlight('visual')
+		end,
+	})
+
 	---Reset highlights
 	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinNew', 'WinLeave' },
+		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinLeave' },
 		{
 			pattern = '*',
 			callback = M.reset,
