@@ -256,7 +256,7 @@ M.setup = function(opts)
 
 	---Reset highlights
 	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinLeave' },
+		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinNew', 'WinLeave' },
 		{
 			pattern = '*',
 			callback = M.reset,
