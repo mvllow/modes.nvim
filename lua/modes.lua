@@ -253,6 +253,12 @@ M.setup = function(opts)
 		end,
 	})
 
+	---Reset visual highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '[vV\x16]:n',
+		callback = M.reset,
+	})
+
 	---Reset highlights
 	vim.api.nvim_create_autocmd(
 		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinLeave' },
