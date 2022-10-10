@@ -198,13 +198,6 @@ M.setup = function(opts)
 			return
 		end
 
-		if current_mode == 'i' then
-			if key == utils.replace_termcodes('<esc>') then
-				M.reset()
-				return
-			end
-		end
-
 		if current_mode == 'n' then
 			-- reset if coming back from operator pending mode
 			if operator_started then
