@@ -52,6 +52,11 @@ local winhighlight = {
 local colors = {}
 local blended_colors = {}
 local operator_started = false
+local in_ignored_buffer = function()
+	return vim.api.nvim_buf_get_option(0, 'buftype') ~= '' -- not a normal buffer
+		or not vim.api.nvim_buf_get_option(0, 'buflisted') -- unlisted buffer
+		or vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype)
+end
 
 M.reset = function()
 	M.highlight('default')
@@ -61,6 +66,10 @@ end
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
+	if in_ignored_buffer() then
+		return
+	end
+
 	local winhl_map = {}
 	local prev_value = vim.api.nvim_win_get_option(0, 'winhighlight')
 
@@ -147,6 +156,10 @@ M.define = function()
 end
 
 M.enable_managed_ui = function()
+	if in_ignored_buffer() then
+		return
+	end
+
 	if config.set_cursor then
 		vim.opt.guicursor:append('v-sm:block-ModesVisual')
 		vim.opt.guicursor:append('i-ci-ve:ver25-ModesInsert')
@@ -159,6 +172,10 @@ M.enable_managed_ui = function()
 end
 
 M.disable_managed_ui = function()
+	if in_ignored_buffer() then
+		return
+	end
+
 	if config.set_cursor then
 		vim.opt.guicursor:remove('v-sm:block-ModesVisual')
 		vim.opt.guicursor:remove('i-ci-ve:ver25-ModesInsert')
@@ -273,12 +290,6 @@ M.setup = function(opts)
 	---Disable managed UI for unfocused windows
 	vim.api.nvim_create_autocmd('WinLeave', {
 		pattern = '*',
-		callback = M.disable_managed_ui,
-	})
-
-	---Disable managed UI for ignored filetypes
-	vim.api.nvim_create_autocmd('FileType', {
-		pattern = config.ignore_filetypes,
 		callback = M.disable_managed_ui,
 	})
 end
