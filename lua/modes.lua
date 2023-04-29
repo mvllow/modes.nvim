@@ -234,11 +234,6 @@ M.setup = function(opts)
 				return
 			end
 		end
-
-		if key == utils.replace_termcodes('<esc>') then
-			M.reset()
-			return
-		end
 	end)
 
 	---Set highlights when colorscheme changes
