@@ -86,6 +86,10 @@ M.highlight = function(scene)
 		winhl_map[builtin] = hl
 	end
 
+	if not config.set_number then
+		winhl_map.CursorLineNr = nil
+	end
+
 	local new_value = {}
 	for builtin, hl in pairs(winhl_map) do
 		table.insert(new_value, ('%s:%s'):format(builtin, hl))
