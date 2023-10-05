@@ -13,7 +13,16 @@ local default_config = {
 	set_cursor = true,
 	set_cursorline = true,
 	set_number = true,
-	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' },
+	ignore_filetypes = {
+		'NvimTree',
+		'lspinfo',
+		'packer',
+		'checkhealth',
+		'help',
+		'man',
+		'TelescopePrompt',
+		'TelescopeResults',
+	}
 }
 local winhighlight = {
 	default = {
@@ -192,7 +201,7 @@ M.disable_managed_ui = function()
 end
 
 M.setup = function(opts)
-	opts = opts or default_config
+	opts = vim.tbl_extend("keep", opts, default_config)
 	if opts.focus_only then
 		print(
 			'modes.nvim – `focus_only` has been removed and is now the default behaviour'
