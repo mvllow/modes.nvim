@@ -201,7 +201,7 @@ M.disable_managed_ui = function()
 end
 
 M.setup = function(opts)
-	opts = vim.tbl_extend("keep", opts, default_config)
+	opts = vim.tbl_extend("keep", opts or {}, default_config)
 	if opts.focus_only then
 		print(
 			'modes.nvim – `focus_only` has been removed and is now the default behaviour'
