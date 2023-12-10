@@ -57,16 +57,14 @@ require('modes').setup({
 
 ## Known issues
 
-- Some _Which Key_ presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if `operators = true` because _Which Key_ takes priority
+- Some _Which Key_ presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if there are `d` and `y` prefixes hooked by _Which Key_ because _Which Key_ takes priority
 
 _Workaround:_
 
 ```lua
 require('which-key').setup({
-	plugins = {
-		presets = {
-			operators = false,
-		},
-	},
+        triggers_blacklist = {
+                n = { "d", "y" }
+        }
 })
 ```
