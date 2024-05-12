@@ -13,6 +13,7 @@ local default_config = {
 	set_cursor = true,
 	set_cursorline = true,
 	set_number = true,
+	set_signcolumn = true,
 	ignore_filetypes = {
 		'NvimTree',
 		'lspinfo',
@@ -22,7 +23,7 @@ local default_config = {
 		'man',
 		'TelescopePrompt',
 		'TelescopeResults',
-	}
+	},
 }
 local winhighlight = {
 	default = {
@@ -99,6 +100,10 @@ M.highlight = function(scene)
 		winhl_map.CursorLineNr = nil
 	end
 
+	if not config.set_signcolumn then
+		winhl_map.CursorLineSign = nil
+	end
+
 	local new_value = {}
 	for builtin, hl in pairs(winhl_map) do
 		table.insert(new_value, ('%s:%s'):format(builtin, hl))
@@ -155,6 +160,16 @@ M.define = function()
 	vim.cmd('hi ModesInsert guibg=' .. colors.insert)
 	vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 
+	local default_cursorline = utils.get_bg('CursorLine', '#26233a')
+
+	if config.set_number then
+		vim.cmd('hi CursorLineNr guibg=' .. default_cursorline)
+	end
+
+	if config.set_signcolumn then
+		vim.cmd('hi CursorLineSign guibg=' .. default_cursorline)
+	end
+
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
 		local def = { bg = blended_colors[mode:lower()] }
 		utils.set_hl(('Modes%sCursorLine'):format(mode), def)
@@ -201,7 +216,7 @@ M.disable_managed_ui = function()
 end
 
 M.setup = function(opts)
-	opts = vim.tbl_extend("keep", opts or {}, default_config)
+	opts = vim.tbl_extend('keep', opts or {}, default_config)
 	if opts.focus_only then
 		print(
 			'modes.nvim – `focus_only` has been removed and is now the default behaviour'
