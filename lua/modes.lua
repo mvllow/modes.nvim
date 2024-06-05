@@ -128,28 +128,28 @@ M.highlight = function(scene)
 end
 
 M.define = function()
-	local normal_bg = utils.get_bg('Normal', 'Normal')
 	colors = {
+		bg = config.colors.bg or utils.get_bg('Normal', 'Normal'),
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
 		insert = config.colors.insert or utils.get_bg('ModesInsert', '#78ccc5'),
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	blended_colors = {
-		copy = utils.blend(colors.copy, normal_bg, config.line_opacity.copy),
+		copy = utils.blend(colors.copy, colors.bg, config.line_opacity.copy),
 		delete = utils.blend(
 			colors.delete,
-			normal_bg,
+			colors.bg,
 			config.line_opacity.delete
 		),
 		insert = utils.blend(
 			colors.insert,
-			normal_bg,
+			colors.bg,
 			config.line_opacity.insert
 		),
 		visual = utils.blend(
 			colors.visual,
-			normal_bg,
+			colors.bg,
 			config.line_opacity.visual
 		),
 	}
