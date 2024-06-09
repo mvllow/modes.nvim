@@ -7,7 +7,7 @@
 ```lua
 {
 	"mvllow/modes.nvim",
-	tag = "v0.2.0",
+	tag = "v0.3.0",
 }
 ```
 
@@ -15,9 +15,12 @@
 
 ## Options
 
+> Setup is not required unless changing these values
+
 ```lua
 require('modes').setup({
 	colors = {
+		bg      = "Normal",
 		copy    = "#ecb441",
 		delete  = "#ef4377",
 		insert  = "#42c2de",
@@ -42,7 +45,7 @@ require('modes').setup({
 	set_signcolumn = true,
 
 	-- Disable modes highlights in specified filetypes
-	ignore_filetypes = { "NvimTree", "TelescopePrompt" }
+	ignore_filetypes = {}
 })
 ```
 
