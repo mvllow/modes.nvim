@@ -1,0 +1,4 @@
+Modes	modes.txt	/*Modes*
+Modes.config	modes.txt	/*Modes.config*
+Modes.setup()	modes.txt	/*Modes.setup()*
+modes.nvim	modes.txt	/*modes.nvim*

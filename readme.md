@@ -5,13 +5,10 @@
 ## Usage
 
 ```lua
-use({
-	'mvllow/modes.nvim',
-	tag = 'v0.2.0',
-	config = function()
-		require('modes').setup()
-	end
-})
+{
+	"mvllow/modes.nvim",
+	tag = "v0.2.0",
+}
 ```
 
 ![modes.nvim](https://user-images.githubusercontent.com/1474821/127896095-6da221cf-3327-4eed-82be-ce419bdf647c.gif)
@@ -21,10 +18,11 @@ use({
 ```lua
 require('modes').setup({
 	colors = {
-		copy = "#f5c359",
-		delete = "#c75c6a",
-		insert = "#78ccc5",
-		visual = "#9745be",
+		copy    = "#ecb441",
+		delete  = "#ef4377",
+		insert  = "#42c2de",
+		replace = "#b6df71",
+		visual  = "#bca3ff",
 	},
 
 	-- Set opacity for cursorline and number background
@@ -40,9 +38,11 @@ require('modes').setup({
 	-- Enable line number highlights to match cursorline
 	set_number = true,
 
+	-- Enable signcolumn highlights to match cursorline
+	set_signcolumn = true,
+
 	-- Disable modes highlights in specified filetypes
-	-- Please PR commonly ignored filetypes
-	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' }
+	ignore_filetypes = { "NvimTree", "TelescopePrompt" }
 })
 ```
 
@@ -50,21 +50,35 @@ require('modes').setup({
 
 | Highlight group | Default value   |
 | --------------- | --------------- |
-| `ModesCopy`     | `guibg=#f5c359` |
-| `ModesDelete`   | `guibg=#c75c6a` |
-| `ModesInsert`   | `guibg=#78ccc5` |
-| `ModesVisual`   | `guibg=#9745be` |
+| `ModesCopy`     | `guibg=#ecb441` |
+| `ModesDelete`   | `guibg=#ef4377` |
+| `ModesInsert`   | `guibg=#42c2de` |
+| `ModesReplace`  | `guibg=#b6df71` |
+| `ModesVisual`   | `guibg=#bca3ff` |
 
 ## Known issues
 
-- Some _Which Key_ presets conflict with this plugin. For example, `d` and `y` operators will not apply highlights if there are `d` and `y` prefixes hooked by _Which Key_ because _Which Key_ takes priority
+- [which-key.nvim](https://github.com/folke/which-key.nvim) takes priority for `d` and `y` operators, preventing Modes from effectively applying highlights.
 
 _Workaround:_
 
 ```lua
-require('which-key').setup({
+-- Disable d and y triggers
+require("which-key").setup({
         triggers_blacklist = {
                 n = { "d", "y" }
         }
 })
+```
+
+## Contributing
+
+Pull requests are welcome and appreciated!
+
+### Generating documentation
+
+Inside of Neovim, with [mini.doc](https://github.com/echasnovski/mini.doc) in your runtimepath:
+
+```lua
+:luafile scripts/minidoc.lua
 ```
