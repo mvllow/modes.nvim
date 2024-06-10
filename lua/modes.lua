@@ -125,10 +125,6 @@ Modes.enable = function(config)
 		vim.opt.guicursor:append("r-cr-o:ModesOperator")
 	end
 
-	if config.set_cursorline then
-		vim.opt.cursorline = true
-	end
-
 	H.detect_mode_changes()
 end
 
@@ -139,10 +135,6 @@ Modes.disable = function(config)
 		vim.opt.guicursor:remove("v-sm:ModesVisual")
 		vim.opt.guicursor:remove("i-ci-ve:ModesInsert")
 		vim.opt.guicursor:remove("r-cr-o:ModesOperator")
-	end
-
-	if config.set_cursorline then
-		vim.opt.cursorline = false
 	end
 
 	H.detect_mode_changes(false)
