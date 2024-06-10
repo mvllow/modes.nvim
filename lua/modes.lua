@@ -425,7 +425,7 @@ H.detect_mode_changes = function(enable)
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "CmdlineLeave", "InsertLeave", "TextYankPost", "WinLeave" }, {
+	vim.api.nvim_create_autocmd({ "CmdlineLeave", "InsertLeave", "WinLeave" }, {
 		group = group,
 		pattern = "*",
 		callback = function()
