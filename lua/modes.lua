@@ -141,14 +141,7 @@ Modes.disable = function(config)
 end
 
 Modes.toggle = function()
-	local enabled = false
-	pcall(function()
-		-- If this doesn't error, then the module is (hopefully) enabled
-		vim.api.nvim_get_autocmds({ group = "ModesEventListener" })
-		enabled = true
-	end)
-
-	if enabled then
+	if H.is_enabled() then
 		Modes.disable()
 	else
 		Modes.enable()
@@ -312,11 +305,6 @@ H.apply_scene = function(scene)
 end
 
 H.detect_mode_changes = function(enable)
-	if enable ~= nil and enable == false then
-		vim.api.nvim_del_augroup_by_name("ModesEventListener")
-		return
-	end
-
 	---@type Scene|nil
 	local interrupted_scene
 	local operator_mode_active = false
@@ -445,18 +433,19 @@ H.detect_mode_changes = function(enable)
 			Modes.reset()
 		end,
 	})
-	vim.api.nvim_create_autocmd("BufEnter", {
-		group = group,
+
+	vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
 		pattern = "*",
 		callback = function()
-			Modes.enable()
-		end,
-	})
-	vim.api.nvim_create_autocmd("WinLeave", {
-		group = group,
-		pattern = "*",
-		callback = function()
-			Modes.disable()
+			if not H.is_enabled() then
+				return
+			end
+
+			if H.in_ignored_buffer() then
+				Modes.disable()
+			else
+				Modes.enable()
+			end
 		end,
 	})
 end
@@ -499,6 +488,16 @@ H.set_highlight = function(name, color)
 	end
 
 	vim.api.nvim_set_hl(0, name, { fg = color.fg, bg = color.bg, default = true })
+end
+
+H.is_enabled = function()
+	local enabled = false
+	pcall(function()
+		-- If this doesn't error, then the module is (hopefully) enabled
+		vim.api.nvim_get_autocmds({ group = "ModesEventListener" })
+		enabled = true
+	end)
+	return enabled
 end
 
 H.in_ignored_buffer = function()
