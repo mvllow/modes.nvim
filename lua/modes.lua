@@ -167,17 +167,6 @@ H.setup_config = function(config)
 		config.line_opacity.visual = config.line_opacity
 	end
 
-	vim.validate({
-		colors = { config.colors, "table" },
-		ignore_filetypes = { config.ignore_filetypes, "table" },
-		line_opacity = { config.line_opacity, "table" },
-		set_cursor = { config.set_cursor, "boolean" },
-		set_cursorline = { config.set_cursorline, "boolean" },
-		set_modemsg = { config.set_modemsg, "boolean" },
-		set_number = { config.set_number, "boolean" },
-		set_signcolumn = { config.set_signcolumn, "boolean" },
-	})
-
 	return config
 end
 
