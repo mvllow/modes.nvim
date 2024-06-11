@@ -222,17 +222,17 @@ H.setup_colors = function()
 		local blended_color = blended_colors[mode:lower()]
 
 		H.set_highlight(("Modes%s"):format(mode), { bg = color })
-		H.set_highlight(("Modes%sCursorLine"):format(mode), { bg = blended_color })
-		H.set_highlight(("Modes%sCursorLineFold"):format(mode), { bg = blended_color })
-		H.set_highlight(("Modes%sCursorLineNr"):format(mode), { fg = color, bg = blended_color, nocombine = false })
-		H.set_highlight(("Modes%sCursorLineSign"):format(mode), { bg = blended_color })
+		H.set_highlight(("Modes%sCursorLine"):format(mode), { bg = blended_color }, "CursorLine")
+		H.set_highlight(("Modes%sCursorLineFold"):format(mode), { bg = blended_color }, "CursorLineFold")
+		H.set_highlight(("Modes%sCursorLineNr"):format(mode), { fg = color, bg = blended_color }, "CursorLineNr")
+		H.set_highlight(("Modes%sCursorLineSign"):format(mode), { bg = blended_color }, "CursorLineSign")
 	end
 
-	H.set_highlight("ModesInsertModeMsg", { fg = colors.insert })
-	H.set_highlight("ModesReplaceModeMsg", { fg = colors.replace })
-	H.set_highlight("ModesReplaceVisual", { bg = blended_colors.replace })
-	H.set_highlight("ModesVisualModeMsg", { fg = colors.visual })
-	H.set_highlight("ModesVisualVisual", { bg = blended_colors.visual })
+	H.set_highlight("ModesInsertModeMsg", { fg = colors.insert }, "ModeMsg")
+	H.set_highlight("ModesReplaceModeMsg", { fg = colors.replace }, "ModeMsg")
+	H.set_highlight("ModesReplaceVisual", { bg = blended_colors.replace }, "Visual")
+	H.set_highlight("ModesVisualModeMsg", { fg = colors.visual }, "ModeMsg")
+	H.set_highlight("ModesVisualVisual", { bg = blended_colors.visual }, "Visual")
 end
 
 ---@param scene Scene
@@ -278,7 +278,7 @@ H.apply_scene = function(scene)
 		elseif scene == "replace" then
 			H.set_highlight("ModesOperator", { link = "ModesReplace" })
 		else
-			H.set_highlight("ModesOperator", { clear = true })
+			H.set_highlight("ModesOperator", {})
 		end
 	end
 
@@ -470,13 +470,18 @@ H.get_highlight_color = function(name, fallback, attr)
 	return (color and color ~= "") and color or fallback
 end
 
-H.set_highlight = function(name, color)
+H.set_highlight = function(name, color, extended_name)
 	if color.link ~= nil then
 		vim.api.nvim_set_hl(0, name, { link = color.link, force = true })
 		return
 	end
 
-	vim.api.nvim_set_hl(0, name, { fg = color.fg, bg = color.bg, default = true })
+	if extended_name then
+		local extended_group = vim.api.nvim_get_hl(0, { name = extended_name })
+		color = vim.tbl_deep_extend("force", extended_group, color)
+	end
+
+	vim.api.nvim_set_hl(0, name, color)
 end
 
 H.is_enabled = function()
