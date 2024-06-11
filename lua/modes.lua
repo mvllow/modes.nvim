@@ -294,6 +294,10 @@ H.apply_scene = function(scene)
 end
 
 H.detect_mode_changes = function(enable)
+	if H.is_enabled() and enable == false then
+		pcall(vim.api.nvim_del_augroup_by_name, "ModesEventListener")
+	end
+
 	---@type Scene|nil
 	local interrupted_scene
 	local operator_mode_active = false
