@@ -294,8 +294,21 @@ H.apply_scene = function(scene)
 end
 
 H.detect_mode_changes = function(enable)
-	if H.is_enabled() and enable == false then
-		pcall(vim.api.nvim_del_augroup_by_name, "ModesEventListener")
+	local group_name = "ModesEventListener"
+	pcall(vim.api.nvim_del_augroup_by_name, group_name)
+
+	if enable == false then
+		local group = vim.api.nvim_create_augroup(group_name, { clear = true })
+		vim.api.nvim_create_autocmd("BufLeave", {
+			group = group,
+			pattern = "*",
+			callback = function()
+				if not H.in_ignored_buffer() then
+					H.detect_mode_changes()
+				end
+			end,
+		})
+		return
 	end
 
 	---@type Scene|nil
@@ -362,7 +375,7 @@ H.detect_mode_changes = function(enable)
 		end
 	end)
 
-	local group = vim.api.nvim_create_augroup("ModesEventListener", { clear = true })
+	local group = vim.api.nvim_create_augroup(group_name, { clear = true })
 
 	vim.api.nvim_create_autocmd("ColorScheme", {
 		group = group,
