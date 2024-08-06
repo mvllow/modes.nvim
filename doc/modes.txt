@@ -40,7 +40,7 @@ Usage ~
 Module config
 
 Default values:
->
+>lua
   Modes.config = {
   	---@type table<string, string|nil>
   	colors = {
@@ -67,6 +67,5 @@ Default values:
   	set_signcolumn = true,
   }
 <
-
 
  vim:tw=78:ts=8:noet:ft=help:norl:
