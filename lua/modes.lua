@@ -17,9 +17,9 @@
 ---
 --- # Setup ~
 ---
---- Modes does not require any setup but can be called with your `config` table
---- to modify default behaviour. This will create a global Lua table `Modes`
---- which you can use for scripting or manually (with `:lua Modes.*`)
+--- Modes setup can be called with your `config` table to modify default
+--- behaviour. This will create a global Lua table `Modes` which you can use
+--- for scripting or manually (with `:lua Modes.*`)
 ---
 --- See |Modes.config| for `config` options and default values.
 

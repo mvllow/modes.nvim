@@ -15,8 +15,6 @@
 
 ## Options
 
-> Setup is not required unless changing these values
-
 ```lua
 require('modes').setup({
 	colors = {
