@@ -4,7 +4,7 @@ if _G.MiniDoc == nil then
 	minidoc.setup()
 end
 
-local hooks = vim.deepcopy(MiniDoc.default_hooks)
+local hooks = vim.deepcopy(minidoc.default_hooks)
 
 hooks.write_pre = function(lines)
 	-- Remove first two lines with `======` and `------` delimiters to comply
@@ -14,4 +14,4 @@ hooks.write_pre = function(lines)
 	return lines
 end
 
-MiniDoc.generate({ "lua/modes.lua" }, "doc/modes.txt", { hooks = hooks })
+minidoc.generate({ "lua/modes.lua" }, "doc/modes.txt", { hooks = hooks })
