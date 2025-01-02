@@ -453,6 +453,7 @@ H.detect_mode_changes = function(enable)
 	})
 
 	vim.api.nvim_create_autocmd({ "BufEnter" }, {
+		group = group,
 		pattern = "*",
 		callback = function()
 			if not H.is_enabled() then
