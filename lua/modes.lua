@@ -18,8 +18,7 @@
 --- # Setup ~
 ---
 --- Modes setup can be called with your `config` table to modify default
---- behaviour. This will create a global Lua table `Modes` which you can use
---- for scripting or manually (with `:lua Modes.*`)
+--- behaviour.
 ---
 --- See |Modes.config| for `config` options and default values.
 
@@ -27,6 +26,9 @@
 
 local Modes = {}
 local H = {}
+
+local winhighlight_cache = {}
+local color_cache = {}
 
 H.winhighlight = {
 	copy = {
@@ -76,8 +78,6 @@ H.winhighlight = {
 ---
 ---@usage `require('modes').setup({})` (replace `{}` with your `config` table)
 Modes.setup = function(config)
-	_G.Modes = Modes
-
 	config = H.setup_config(config)
 
 	H.apply_config(config)
@@ -238,9 +238,16 @@ end
 ---@param scene Scene
 ---@private
 H.apply_scene = function(scene)
-	if H.in_ignored_buffer() then
+	if scene == H.current_scene or H.in_ignored_buffer() then
 		return
 	end
+	H.current_scene = scene
+
+	if winhighlight_cache[scene] then
+		vim.api.nvim_set_option_value("winhighlight", winhighlight_cache[scene], { win = 0 })
+		return
+	end
+
 
 	local winhl_map = {}
 	local prev_value = vim.api.nvim_get_option_value("winhighlight", { win = 0 })
@@ -268,7 +275,11 @@ H.apply_scene = function(scene)
 	for builtin, hl in pairs(winhl_map) do
 		table.insert(new_value, ("%s:%s"):format(builtin, hl))
 	end
-	vim.api.nvim_set_option_value("winhighlight", table.concat(new_value, ","), { win = 0 })
+
+	local result = table.concat(new_value, ",")
+	winhighlight_cache[scene] = result
+
+	vim.api.nvim_set_option_value("winhighlight", result, { win = 0 })
 
 	if Modes.config.set_cursor then
 		if scene == "copy" then
@@ -297,8 +308,9 @@ H.detect_mode_changes = function(enable)
 	local group_name = "ModesEventListener"
 	pcall(vim.api.nvim_del_augroup_by_name, group_name)
 
+	local group = vim.api.nvim_create_augroup(group_name, { clear = true })
+
 	if enable == false then
-		local group = vim.api.nvim_create_augroup(group_name, { clear = true })
 		vim.api.nvim_create_autocmd("BufLeave", {
 			group = group,
 			pattern = "*",
@@ -332,8 +344,10 @@ H.detect_mode_changes = function(enable)
 		-- On escape
 		if key == "\x1b" then
 			Modes.reset()
+			H.current_scene = ""
 
 			if interrupted_scene ~= nil then
+				H.current_scene = interrupted_scene
 				H.apply_scene(interrupted_scene)
 				interrupted_scene = nil
 			end
@@ -374,8 +388,6 @@ H.detect_mode_changes = function(enable)
 			end
 		end
 	end)
-
-	local group = vim.api.nvim_create_augroup(group_name, { clear = true })
 
 	vim.api.nvim_create_autocmd("ColorScheme", {
 		group = group,
@@ -440,7 +452,7 @@ H.detect_mode_changes = function(enable)
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
+	vim.api.nvim_create_autocmd({ "BufEnter" }, {
 		pattern = "*",
 		callback = function()
 			if not H.is_enabled() then
@@ -472,6 +484,11 @@ H.normalize_color = function(name)
 end
 
 H.blend = function(fg, bg, alpha)
+	local cache_key = fg .. bg .. tostring(alpha)
+	if color_cache[cache_key] then
+		return color_cache[cache_key]
+	end
+
 	local fg_color = H.normalize_color(fg)
 	local bg_color = H.normalize_color(bg)
 
@@ -479,12 +496,21 @@ H.blend = function(fg, bg, alpha)
 		return math.floor((alpha * fg_color[i] + (1 - alpha) * bg_color[i]) + 0.5)
 	end
 
-	return string.format("#%02X%02X%02X", blend_channel(1), blend_channel(2), blend_channel(3))
+	local color = string.format("#%02X%02X%02X", blend_channel(1), blend_channel(2), blend_channel(3))
+	color_cache[cache_key] = color
+	return color
 end
 
 H.get_highlight_color = function(name, fallback, attr)
+	local cache_key = name .. (attr or "bg")
+	if color_cache[cache_key] then
+		return color_cache[cache_key]
+	end
+
 	local color = vim.fn.synIDattr(vim.api.nvim_get_hl_id_by_name(name), attr or "bg")
-	return (color and color ~= "") and color or fallback
+	color = (color and color ~= "") and color or fallback
+	color_cache[cache_key] = color
+	return color
 end
 
 H.set_highlight = function(name, color, extended_name)
@@ -512,9 +538,13 @@ H.is_enabled = function()
 end
 
 H.in_ignored_buffer = function()
-	return vim.api.nvim_get_option_value("buftype", { buf = 0 }) ~= ""
-		or not vim.api.nvim_get_option_value("buflisted", { buf = 0 })
-		or vim.tbl_contains(Modes.config.ignore_filetypes, vim.bo.filetype)
+	if vim.api.nvim_get_option_value("buftype", { buf = 0 }) ~= "" then
+		return true
+	end
+	if not vim.api.nvim_get_option_value("buflisted", { buf = 0 }) then
+		return true
+	end
+	return vim.tbl_contains(Modes.config.ignore_filetypes, vim.bo.filetype)
 end
 
 return Modes
