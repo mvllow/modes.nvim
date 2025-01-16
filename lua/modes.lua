@@ -30,6 +30,11 @@ local H = {}
 local winhighlight_cache = {}
 local color_cache = {}
 
+H.clear_color_cache = function()
+	color_cache = {}
+	winhighlight_cache = {}
+end
+
 H.winhighlight = {
 	copy = {
 		CursorLine = "ModesCopyCursorLine",
@@ -138,6 +143,7 @@ Modes.disable = function(config)
 	end
 
 	H.detect_mode_changes(false)
+	H.clear_color_cache()
 end
 
 Modes.toggle = function()
@@ -201,7 +207,16 @@ end
 -- Implementation
 
 H.setup_colors = function()
-	local normal_bg = Modes.config.colors.bg or H.get_highlight_color("Normal", "NvimDarkGrey2")
+	local normal_bg = Modes.config.colors.bg
+
+	-- TODO: Refactor
+	-- Handle transparent backgrounds
+	if normal_bg == "NONE" or normal_bg == nil then
+		local bg = H.get_highlight_color("Normal", "bg")
+		normal_bg = bg and bg ~= "" and bg or
+			(vim.o.background == "dark" and "#000000" or "#FFFFFF")
+	end
+
 	local colors = {
 		copy = Modes.config.colors.copy or H.get_highlight_color("ModesCopy", "#ecb441"),
 		delete = Modes.config.colors.delete or H.get_highlight_color("ModesDelete", "#ef4377"),
@@ -393,6 +408,7 @@ H.detect_mode_changes = function(enable)
 		group = group,
 		pattern = "*",
 		callback = function()
+			H.clear_color_cache()
 			H.setup_colors()
 		end,
 	})
@@ -471,16 +487,16 @@ end
 
 -- Utilities
 
-H.normalize_color = function(name)
-	local color = vim.api.nvim_get_color_by_name(name)
-	if color == -1 then
-		color = vim.o.background == "dark" and 0x000000 or 0xFFFFFF
+H.normalize_color = function(color)
+	local num_color = vim.api.nvim_get_color_by_name(color)
+	if num_color == -1 then
+		num_color = vim.o.background == "dark" and 0x000000 or 0xFFFFFF
 	end
 
 	return {
-		bit.band(bit.rshift(color, 16), 0xFF),
-		bit.band(bit.rshift(color, 8), 0xFF),
-		bit.band(color, 0xFF),
+		bit.band(bit.rshift(num_color, 16), 0xFF),
+		bit.band(bit.rshift(num_color, 8), 0xFF),
+		bit.band(num_color, 0xFF),
 	}
 end
 
