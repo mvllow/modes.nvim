@@ -155,10 +155,18 @@ M.define = function()
 	}
 
 	---Create highlight groups
-	vim.cmd('hi ModesCopy guibg=' .. colors.copy)
-	vim.cmd('hi ModesDelete guibg=' .. colors.delete)
-	vim.cmd('hi ModesInsert guibg=' .. colors.insert)
-	vim.cmd('hi ModesVisual guibg=' .. colors.visual)
+	if colors.copy ~= "" then
+		vim.cmd('hi ModesCopy guibg=' .. colors.copy)
+	end
+	if colors.delete ~= "" then
+		vim.cmd('hi ModesDelete guibg=' .. colors.delete)
+	end
+	if colors.insert ~= "" then
+		vim.cmd('hi ModesInsert guibg=' .. colors.insert)
+	end
+	if colors.visual ~= "" then
+		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
+	end
 
 	local default_cursorline = utils.get_bg('CursorLine', '#26233a')
 
@@ -171,16 +179,22 @@ M.define = function()
 	end
 
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
-		local def = { bg = blended_colors[mode:lower()] }
-		utils.set_hl(('Modes%sCursorLine'):format(mode), def)
-		utils.set_hl(('Modes%sCursorLineNr'):format(mode), def)
-		utils.set_hl(('Modes%sCursorLineSign'):format(mode), def)
-		utils.set_hl(('Modes%sCursorLineFold'):format(mode), def)
+		if colors[mode:lower()] ~= "" then
+			local def = { bg = blended_colors[mode:lower()] }
+			utils.set_hl(('Modes%sCursorLine'):format(mode), def)
+			utils.set_hl(('Modes%sCursorLineNr'):format(mode), def)
+			utils.set_hl(('Modes%sCursorLineSign'):format(mode), def)
+			utils.set_hl(('Modes%sCursorLineFold'):format(mode), def)
+		end
 	end
 
-	utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
-	utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
-	utils.set_hl('ModesVisualVisual', { bg = blended_colors.visual })
+	if colors.insert ~= "" then
+		utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
+	end
+	if colors.visual ~= "" then
+		utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
+		utils.set_hl('ModesVisualVisual', { bg = blended_colors.visual })
+	end
 end
 
 M.enable_managed_ui = function()
