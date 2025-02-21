@@ -358,6 +358,8 @@ H.detect_mode_changes = function(enable)
 
 		-- On escape
 		if key == "\x1b" then
+			operator_mode_active = false
+			replace_mode_active = false
 			Modes.reset()
 			H.current_scene = ""
 
@@ -379,11 +381,13 @@ H.detect_mode_changes = function(enable)
 
 			if key == "y" then
 				H.apply_scene("copy")
+				operator_mode_active = true
 				return
 			end
 
 			if key == "d" then
 				H.apply_scene("delete")
+				operator_mode_active = true
 				return
 			end
 
