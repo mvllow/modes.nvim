@@ -83,9 +83,9 @@ H.winhighlight = {
 ---
 ---@usage `require('modes').setup({})` (replace `{}` with your `config` table)
 Modes.setup = function(config)
-	config = H.setup_config(config)
+	Modes.config = vim.tbl_deep_extend("force", vim.deepcopy(Modes.config), config or {})
 
-	H.apply_config(config)
+	H.apply_config(Modes.config)
 	H.setup_colors()
 	H.detect_mode_changes()
 end
@@ -95,36 +95,76 @@ end
 --- Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 Modes.config = {
-	---@type table<string, string|nil>
-	colors = {
-		bg = nil,
-		copy = nil,
-		delete = nil,
-		insert = nil,
-		replace = nil,
-		visual = nil,
+	copy = {
+		enable = true,
+		color = nil,
+		opacity = 0.15,
 	},
-	-- Unlisted buffers are ignored by default
+	delete = {
+		enable = true,
+		color = nil,
+		opacity = 0.15,
+	},
+	insert = {
+		enable = true,
+		color = nil,
+		opacity = 0.15,
+	},
+	replace = {
+		enable = true,
+		color = nil,
+		opacity = 0.15,
+	},
+	visual = {
+		enable = true,
+		color = nil,
+		opacity = 0.15,
+	},
+	ui = {
+		cursor = true,
+		cursorline = true,
+		modemsg = true,
+		number = true,
+		signcolumn = true,
+	},
+	--- Unlisted buffers are ignored by default
 	ignore_filetypes = {},
-	line_opacity = {
-		copy = 0.15,
-		delete = 0.15,
-		insert = 0.15,
-		replace = 0.15,
-		visual = 0.15,
-	},
-	set_cursor = true,
-	set_cursorline = true,
-	set_modemsg = true,
-	set_number = true,
-	set_signcolumn = true,
+
+	---@type table<string, string|nil>
+	---@deprecated Replaced with `<mode>.color`
+	-- colors = {
+	-- 	bg = nil,
+	-- 	copy = nil,
+	-- 	delete = nil,
+	-- 	insert = nil,
+	-- 	replace = nil,
+	-- 	visual = nil,
+	-- },
+	---@deprecated Replaced with `<mode>.opacity`
+	-- line_opacity = {
+	-- 	copy = 0.15,
+	-- 	delete = 0.15,
+	-- 	insert = 0.15,
+	-- 	replace = 0.15,
+	-- 	visual = 0.15,
+	-- },
+	---@deprecated Replace with `ui.cursor`
+	-- set_cursor = true,
+	---@deprecated Replace with `ui.cursorline`
+	-- set_cursorline = true,
+	---@deprecated Replace with `ui.modemsg`
+	-- set_modemsg = true,
+	---@deprecated Replace with `ui.number`
+	-- set_number = true,
+	---@deprecated Replace with `ui.signcolumn`
+	-- set_signcolumn = true,
 }
 --minidoc_afterlines_end
 
 Modes.enable = function(config)
 	config = config or Modes.config
 
-	if config.set_cursor then
+	if config.ui.cursor then
 		vim.opt.guicursor:append("v-sm:ModesVisual")
 		vim.opt.guicursor:append("i-ci-ve:ModesInsert")
 		vim.opt.guicursor:append("r-cr-o:ModesOperator")
@@ -136,7 +176,7 @@ end
 Modes.disable = function(config)
 	config = config or Modes.config
 
-	if config.set_cursor then
+	if config.ui.cursor then
 		vim.opt.guicursor:remove("v-sm:ModesVisual")
 		vim.opt.guicursor:remove("i-ci-ve:ModesInsert")
 		vim.opt.guicursor:remove("r-cr-o:ModesOperator")
@@ -155,99 +195,80 @@ Modes.toggle = function()
 end
 
 Modes.reset = function()
+	H.current_scene = nil
 	H.apply_scene("normal")
-end
-
--- Configuration
-
-H.default_config = vim.deepcopy(Modes.config)
-
-H.setup_config = function(config)
-	config = vim.tbl_deep_extend("force", vim.deepcopy(H.default_config), config or {})
-
-	if type(config.line_opacity) == "number" then
-		config.line_opacity.copy = config.line_opacity
-		config.line_opacity.delete = config.line_opacity
-		config.line_opacity.insert = config.line_opacity
-		config.line_opacity.replace = config.line_opacity
-		config.line_opacity.visual = config.line_opacity
-	end
-
-	return config
 end
 
 H.apply_config = function(config)
 	Modes.config = config
 
-	if config.set_cursor then
+	if config.ui.cursor then
 		vim.opt.guicursor:append("v-sm:ModesVisual")
 		vim.opt.guicursor:append("i-ci-ve:ModesInsert")
 		vim.opt.guicursor:append("r-cr-o:ModesOperator")
 	end
 
-	if config.set_cursorline then
-		vim.opt.cursorline = true
+	if config.ui.cursorline then
+		vim.o.cursorline = true
 	end
 
-	if config.set_modemsg then
-		vim.opt.showmode = true
+	if config.ui.modemsg then
+		vim.o.showmode = true
 		H.set_highlight("ModeMsg", { link = "ModesModeMsg" })
 	end
 
-	if config.set_number then
-		vim.opt.number = true
+	if config.ui.number then
+		vim.o.number = true
 		H.set_highlight("CursorLineNr", { link = "ModesCursorLineNr" })
 	end
 
-	if config.set_signcolumn then
+	if config.ui.signcolumn then
 		H.set_highlight("CursorLineSign", { link = "ModesCursorLineSign" })
 	end
 end
 
--- Implementation
-
 H.setup_colors = function()
-	local normal_bg = Modes.config.colors.bg
-
-	-- TODO: Refactor
-	-- Handle transparent backgrounds
-	if normal_bg == "NONE" or normal_bg == nil then
-		local bg = H.get_highlight_color("Normal", "bg")
-		normal_bg = bg and bg ~= "" and bg or
-			(vim.o.background == "dark" and "#000000" or "#FFFFFF")
+	local fallback_bg = (vim.o.background == "dark" and "#000000" or "#FFFFFF")
+	local bg = H.get_highlight_color("Normal", fallback_bg)
+	if bg == "NONE" or bg == "" or bg == nil then
+		bg = fallback_bg
 	end
 
 	local colors = {
-		copy = Modes.config.colors.copy or H.get_highlight_color("ModesCopy", "#ecb441"),
-		delete = Modes.config.colors.delete or H.get_highlight_color("ModesDelete", "#ef4377"),
-		insert = Modes.config.colors.insert or H.get_highlight_color("ModesInsert", "#42c2de"),
-		replace = Modes.config.colors.replace or H.get_highlight_color("ModesReplace", "#b6df71"),
-		visual = Modes.config.colors.visual or H.get_highlight_color("ModesVisual", "#bca3ff"),
+		copy = Modes.config.copy.color or H.get_highlight_color("ModesCopy", "#ecb441"),
+		delete = Modes.config.delete.color or H.get_highlight_color("ModesDelete", "#ef4377"),
+		insert = Modes.config.insert.color or H.get_highlight_color("ModesInsert", "#42c2de"),
+		replace = Modes.config.replace.color or H.get_highlight_color("ModesReplace", "#b6df71"),
+		visual = Modes.config.visual.color or H.get_highlight_color("ModesVisual", "#bca3ff"),
 	}
 	local blended_colors = {
-		copy = H.blend(colors.copy, normal_bg, Modes.config.line_opacity.copy),
-		delete = H.blend(colors.delete, normal_bg, Modes.config.line_opacity.delete),
-		insert = H.blend(colors.insert, normal_bg, Modes.config.line_opacity.insert),
-		replace = H.blend(colors.replace, normal_bg, Modes.config.line_opacity.replace),
-		visual = H.blend(colors.visual, normal_bg, Modes.config.line_opacity.visual),
+		copy = H.blend(colors.copy, bg, Modes.config.copy.opacity),
+		delete = H.blend(colors.delete, bg, Modes.config.delete.opacity),
+		insert = H.blend(colors.insert, bg, Modes.config.insert.opacity),
+		replace = H.blend(colors.replace, bg, Modes.config.replace.opacity),
+		visual = H.blend(colors.visual, bg, Modes.config.visual.opacity),
 	}
 
 	for _, mode in ipairs({ "Copy", "Delete", "Insert", "Replace", "Visual" }) do
-		local color = colors[mode:lower()]
-		local blended_color = blended_colors[mode:lower()]
+		if Modes.config[mode:lower()].enable then
+			local color = colors[mode:lower()]
+			local blended_color = blended_colors[mode:lower()]
 
-		H.set_highlight(("Modes%s"):format(mode), { bg = color })
-		H.set_highlight(("Modes%sCursorLine"):format(mode), { bg = blended_color }, "CursorLine")
-		H.set_highlight(("Modes%sCursorLineFold"):format(mode), { bg = blended_color }, "CursorLineFold")
-		H.set_highlight(("Modes%sCursorLineNr"):format(mode), { fg = color, bg = blended_color }, "CursorLineNr")
-		H.set_highlight(("Modes%sCursorLineSign"):format(mode), { bg = blended_color }, "CursorLineSign")
+			H.set_highlight(("Modes%s"):format(mode), { bg = color })
+			H.set_highlight(("Modes%sCursorLine"):format(mode), { bg = blended_color }, "CursorLine")
+			H.set_highlight(("Modes%sCursorLineFold"):format(mode), { bg = blended_color }, "CursorLineFold")
+			H.set_highlight(("Modes%sCursorLineNr"):format(mode), { fg = color, bg = blended_color }, "CursorLineNr")
+			H.set_highlight(("Modes%sCursorLineSign"):format(mode), { bg = blended_color }, "CursorLineSign")
+			H.set_highlight(("Modes%sModeMsg"):format(mode), { fg = color }, "ModeMsg")
+		end
 	end
 
-	H.set_highlight("ModesInsertModeMsg", { fg = colors.insert }, "ModeMsg")
-	H.set_highlight("ModesReplaceModeMsg", { fg = colors.replace }, "ModeMsg")
-	H.set_highlight("ModesReplaceVisual", { bg = blended_colors.replace }, "Visual")
-	H.set_highlight("ModesVisualModeMsg", { fg = colors.visual }, "ModeMsg")
-	H.set_highlight("ModesVisualVisual", { bg = blended_colors.visual }, "Visual")
+	if Modes.config.replace.enable then
+		H.set_highlight("ModesReplaceVisual", { bg = blended_colors.replace }, "Visual")
+	end
+	if Modes.config.visual.enable then
+		H.set_highlight("ModesVisualVisual", { bg = blended_colors.visual }, "Visual")
+	end
 end
 
 ---@param scene Scene
@@ -258,11 +279,32 @@ H.apply_scene = function(scene)
 	end
 	H.current_scene = scene
 
+	if Modes.config.ui.cursor then
+		if scene == "copy" then
+			H.set_highlight("ModesOperator", { link = "ModesCopy" })
+		elseif scene == "delete" then
+			H.set_highlight("ModesOperator", { link = "ModesDelete" })
+		elseif scene == "replace" then
+			H.set_highlight("ModesOperator", { link = "ModesReplace" })
+		else
+			H.set_highlight("ModesOperator", {})
+		end
+	end
+
+	if Modes.config.ui.modemsg then
+		if scene == "insert" then
+			H.set_highlight("ModeMsg", { link = "ModesInsertModeMsg" })
+		elseif scene == "replace" then
+			H.set_highlight("ModeMsg", { link = "ModesReplaceModeMsg" })
+		elseif scene == "visual" then
+			H.set_highlight("ModeMsg", { link = "ModesVisualModeMsg" })
+		end
+	end
+
 	if winhighlight_cache[scene] then
 		vim.api.nvim_set_option_value("winhighlight", winhighlight_cache[scene], { win = 0 })
 		return
 	end
-
 
 	local winhl_map = {}
 	local prev_value = vim.api.nvim_get_option_value("winhighlight", { win = 0 })
@@ -278,11 +320,11 @@ H.apply_scene = function(scene)
 		winhl_map[builtin] = hl
 	end
 
-	if not Modes.config.set_number then
+	if not Modes.config.ui.number then
 		winhl_map.CursorLineNr = nil
 	end
 
-	if not Modes.config.set_signcolumn then
+	if not Modes.config.ui.signcolumn then
 		winhl_map.CursorLineSign = nil
 	end
 
@@ -295,28 +337,6 @@ H.apply_scene = function(scene)
 	winhighlight_cache[scene] = result
 
 	vim.api.nvim_set_option_value("winhighlight", result, { win = 0 })
-
-	if Modes.config.set_cursor then
-		if scene == "copy" then
-			H.set_highlight("ModesOperator", { link = "ModesCopy" })
-		elseif scene == "delete" then
-			H.set_highlight("ModesOperator", { link = "ModesDelete" })
-		elseif scene == "replace" then
-			H.set_highlight("ModesOperator", { link = "ModesReplace" })
-		else
-			H.set_highlight("ModesOperator", {})
-		end
-	end
-
-	if Modes.config.set_modemsg then
-		if scene == "insert" then
-			H.set_highlight("ModeMsg", { link = "ModesInsertModeMsg" })
-		elseif scene == "replace" then
-			H.set_highlight("ModeMsg", { link = "ModesReplaceModeMsg" })
-		elseif scene == "visual" then
-			H.set_highlight("ModeMsg", { link = "ModesVisualModeMsg" })
-		end
-	end
 end
 
 H.detect_mode_changes = function(enable)
@@ -356,12 +376,12 @@ H.detect_mode_changes = function(enable)
 			Modes.reset()
 		end
 
-		-- On escape
+		-- Reset on escape
 		if key == "\x1b" then
 			operator_mode_active = false
 			replace_mode_active = false
 			Modes.reset()
-			H.current_scene = ""
+			H.current_scene = nil
 
 			if interrupted_scene ~= nil then
 				H.current_scene = interrupted_scene
@@ -416,8 +436,6 @@ H.detect_mode_changes = function(enable)
 			H.setup_colors()
 		end,
 	})
-
-	-- Mode changes
 
 	vim.api.nvim_create_autocmd("ModeChanged", {
 		group = group,
@@ -488,8 +506,6 @@ H.detect_mode_changes = function(enable)
 		end,
 	})
 end
-
--- Utilities
 
 H.normalize_color = function(color)
 	local num_color = vim.api.nvim_get_color_by_name(color)
