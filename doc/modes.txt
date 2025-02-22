@@ -41,29 +41,20 @@ Module config
 Default values:
 >lua
   Modes.config = {
-  	---@type table<string, string|nil>
-  	colors = {
-  		bg = nil,
-  		copy = nil,
-  		delete = nil,
-  		insert = nil,
-  		replace = nil,
-  		visual = nil,
+  	copy = { enable = true, color = nil, opacity = 0.15 },
+  	delete = { enable = true, color = nil, opacity = 0.15 },
+  	insert = { enable = true, color = nil, opacity = 0.15 },
+  	replace = { enable = true, color = nil, opacity = 0.15 },
+  	visual = { enable = true, color = nil, opacity = 0.15 },
+  	ui = {
+  		cursor = true,
+  		cursorline = true,
+  		modemsg = true,
+  		number = true,
+  		signcolumn = true,
   	},
   	-- Unlisted buffers are ignored by default
   	ignore_filetypes = {},
-  	line_opacity = {
-  		copy = 0.15,
-  		delete = 0.15,
-  		insert = 0.15,
-  		replace = 0.15,
-  		visual = 0.15,
-  	},
-  	set_cursor = true,
-  	set_cursorline = true,
-  	set_modemsg = true,
-  	set_number = true,
-  	set_signcolumn = true,
   }
 <
 

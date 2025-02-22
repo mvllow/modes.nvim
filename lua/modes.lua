@@ -107,37 +107,8 @@ Modes.config = {
 		number = true,
 		signcolumn = true,
 	},
-	--- Unlisted buffers are ignored by default
+	-- Unlisted buffers are ignored by default
 	ignore_filetypes = {},
-
-	---@type table<string, string|nil>
-	---@deprecated Replaced with `<mode>.color`
-	-- colors = {
-	-- 	bg = nil,
-	-- 	copy = nil,
-	-- 	delete = nil,
-	-- 	insert = nil,
-	-- 	replace = nil,
-	-- 	visual = nil,
-	-- },
-	---@deprecated Replaced with `<mode>.opacity`
-	-- line_opacity = {
-	-- 	copy = 0.15,
-	-- 	delete = 0.15,
-	-- 	insert = 0.15,
-	-- 	replace = 0.15,
-	-- 	visual = 0.15,
-	-- },
-	---@deprecated Replace with `ui.cursor`
-	-- set_cursor = true,
-	---@deprecated Replace with `ui.cursorline`
-	-- set_cursorline = true,
-	---@deprecated Replace with `ui.modemsg`
-	-- set_modemsg = true,
-	---@deprecated Replace with `ui.number`
-	-- set_number = true,
-	---@deprecated Replace with `ui.signcolumn`
-	-- set_signcolumn = true,
 }
 --minidoc_afterlines_end
 
