@@ -212,16 +212,10 @@ H.apply_config = function()
 
 	if Modes.config.ui.modemsg then
 		vim.o.showmode = true
-		H.set_highlight("ModeMsg", { link = "ModesModeMsg" })
 	end
 
 	if Modes.config.ui.number then
 		vim.o.number = true
-		H.set_highlight("CursorLineNr", { link = "ModesCursorLineNr" })
-	end
-
-	if Modes.config.ui.signcolumn then
-		H.set_highlight("CursorLineSign", { link = "ModesCursorLineSign" })
 	end
 end
 
