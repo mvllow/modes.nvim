@@ -85,8 +85,8 @@ H.winhighlight = {
 Modes.setup = function(config)
 	Modes.config = vim.tbl_deep_extend("force", vim.deepcopy(Modes.config), config or {})
 
-	H.apply_config()
-	H.setup_colors()
+	H.set_vim_options()
+	H.set_initial_colors()
 	H.detect_mode_changes()
 end
 
@@ -95,31 +95,11 @@ end
 --- Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 Modes.config = {
-	copy = {
-		enable = true,
-		color = nil,
-		opacity = 0.15,
-	},
-	delete = {
-		enable = true,
-		color = nil,
-		opacity = 0.15,
-	},
-	insert = {
-		enable = true,
-		color = nil,
-		opacity = 0.15,
-	},
-	replace = {
-		enable = true,
-		color = nil,
-		opacity = 0.15,
-	},
-	visual = {
-		enable = true,
-		color = nil,
-		opacity = 0.15,
-	},
+	copy = { enable = true, color = nil, opacity = 0.15 },
+	delete = { enable = true, color = nil, opacity = 0.15 },
+	insert = { enable = true, color = nil, opacity = 0.15 },
+	replace = { enable = true, color = nil, opacity = 0.15 },
+	visual = { enable = true, color = nil, opacity = 0.15 },
 	ui = {
 		cursor = true,
 		cursorline = true,
@@ -199,7 +179,7 @@ Modes.reset = function()
 	H.apply_scene("normal")
 end
 
-H.apply_config = function()
+H.set_vim_options = function()
 	if Modes.config.ui.cursor then
 		vim.opt.guicursor:append("v-sm:ModesVisual")
 		vim.opt.guicursor:append("i-ci-ve:ModesInsert")
@@ -219,7 +199,7 @@ H.apply_config = function()
 	end
 end
 
-H.setup_colors = function()
+H.set_initial_colors = function()
 	local fallback_bg = (vim.o.background == "dark" and "#000000" or "#FFFFFF")
 	local bg = H.get_highlight_color("Normal", fallback_bg)
 	if bg == "NONE" or bg == "" or bg == nil then
@@ -426,7 +406,7 @@ H.detect_mode_changes = function(enable)
 		pattern = "*",
 		callback = function()
 			H.clear_color_cache()
-			H.setup_colors()
+			H.set_initial_colors()
 		end,
 	})
 
