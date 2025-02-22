@@ -248,9 +248,10 @@ H.setup_colors = function()
 	}
 
 	for _, mode in ipairs({ "Copy", "Delete", "Insert", "Replace", "Visual" }) do
-		if Modes.config[mode:lower()].enable then
-			local color = colors[mode:lower()]
-			local blended_color = blended_colors[mode:lower()]
+		local scene = mode:lower()
+		if Modes.config[scene].enable then
+			local color = colors[scene]
+			local blended_color = blended_colors[scene]
 
 			H.set_highlight(("Modes%s"):format(mode), { bg = color })
 			H.set_highlight(("Modes%sCursorLine"):format(mode), { bg = blended_color }, "CursorLine")
