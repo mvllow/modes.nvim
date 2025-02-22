@@ -85,7 +85,7 @@ H.winhighlight = {
 Modes.setup = function(config)
 	Modes.config = vim.tbl_deep_extend("force", vim.deepcopy(Modes.config), config or {})
 
-	H.apply_config(Modes.config)
+	H.apply_config()
 	H.setup_colors()
 	H.detect_mode_changes()
 end
@@ -199,30 +199,28 @@ Modes.reset = function()
 	H.apply_scene("normal")
 end
 
-H.apply_config = function(config)
-	Modes.config = config
-
-	if config.ui.cursor then
+H.apply_config = function()
+	if Modes.config.ui.cursor then
 		vim.opt.guicursor:append("v-sm:ModesVisual")
 		vim.opt.guicursor:append("i-ci-ve:ModesInsert")
 		vim.opt.guicursor:append("r-cr-o:ModesOperator")
 	end
 
-	if config.ui.cursorline then
+	if Modes.config.ui.cursorline then
 		vim.o.cursorline = true
 	end
 
-	if config.ui.modemsg then
+	if Modes.config.ui.modemsg then
 		vim.o.showmode = true
 		H.set_highlight("ModeMsg", { link = "ModesModeMsg" })
 	end
 
-	if config.ui.number then
+	if Modes.config.ui.number then
 		vim.o.number = true
 		H.set_highlight("CursorLineNr", { link = "ModesCursorLineNr" })
 	end
 
-	if config.ui.signcolumn then
+	if Modes.config.ui.signcolumn then
 		H.set_highlight("CursorLineSign", { link = "ModesCursorLineSign" })
 	end
 end
