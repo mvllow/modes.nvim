@@ -259,10 +259,11 @@ H.apply_scene = function(scene)
 		end
 	end
 
-	if winhighlight_cache[scene] then
-		vim.api.nvim_set_option_value("winhighlight", winhighlight_cache[scene], { win = 0 })
-		return
-	end
+	-- TODO: Currently this breaks scene detection
+	-- if winhighlight_cache[scene] then
+	-- 	vim.api.nvim_set_option_value("winhighlight", winhighlight_cache[scene], { win = 0 })
+	-- 	return
+	-- end
 
 	local winhl_map = {}
 	local prev_value = vim.api.nvim_get_option_value("winhighlight", { win = 0 })
