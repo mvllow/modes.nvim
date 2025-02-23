@@ -159,6 +159,20 @@ H.set_vim_options = function()
 
 	if Modes.config.ui.cursorline then
 		vim.o.cursorline = true
+
+		local cursorline_hl = vim.api.nvim_get_hl(0, { name = "CursorLine" })
+
+		if cursorline_hl.bg then
+			if Modes.config.ui.number then
+				H.set_highlight("CursorLineNr", { bg = cursorline_hl.bg }, "CursorLineNr")
+			end
+
+			if Modes.config.ui.signcolumn then
+				H.set_highlight("CursorLineSign", { bg = cursorline_hl.bg }, "CursorLineSign")
+			end
+
+			H.set_highlight("CursorLineFold", { bg = cursorline_hl.bg }, "CursorLineFold")
+		end
 	end
 
 	if Modes.config.ui.modemsg then
@@ -495,17 +509,43 @@ H.get_highlight_color = function(name, fallback, attr)
 end
 
 H.set_highlight = function(name, color, extended_name)
-	if color.link ~= nil then
-		vim.api.nvim_set_hl(0, name, { link = color.link, force = true })
-		return
+	local function resolve_highlight(hl_name)
+		local cache_key = "hl_" .. hl_name
+		if color_cache[cache_key] then
+			return color_cache[cache_key]
+		end
+
+		local hl = vim.api.nvim_get_hl(0, { name = hl_name })
+		if hl.link then
+			hl = resolve_highlight(hl.link)
+		end
+
+		color_cache[cache_key] = hl
+		return hl
 	end
+
+	local final_attrs = {}
 
 	if extended_name then
-		local extended_group = vim.api.nvim_get_hl(0, { name = extended_name })
-		color = vim.tbl_deep_extend("force", extended_group, color)
+		final_attrs = resolve_highlight(extended_name)
 	end
 
-	vim.api.nvim_set_hl(0, name, color)
+	if color.link then
+		local linked_attrs = resolve_highlight(color.link)
+		color.link = nil
+		final_attrs = vim.tbl_deep_extend("force", final_attrs, linked_attrs)
+	end
+
+	final_attrs = vim.tbl_deep_extend("force", final_attrs, color)
+
+	local valid_attrs = {}
+	for k, v in pairs(final_attrs) do
+		if type(k) == "string" and k ~= "link" then
+			valid_attrs[k] = v
+		end
+	end
+
+	vim.api.nvim_set_hl(0, name, valid_attrs)
 end
 
 H.is_enabled = function()
