@@ -41,6 +41,9 @@ require('modes').setup({
 	-- Enable line number highlights to match cursorline
 	set_number = true,
 
+	-- Enable sign column highlights to match cursorline
+	set_signcolumn = true,
+
 	-- Disable modes highlights in specified filetypes
 	-- Please PR commonly ignored filetypes
 	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' }
