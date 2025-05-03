@@ -307,9 +307,20 @@ M.setup = function(opts)
 		callback = M.reset,
 	})
 
-	---Reset highlights
+	---Reset insert highlight (unless entering visual mode)
+	vim.api.nvim_create_autocmd('InsertLeave', {
+		pattern = '*',
+		callback = function()
+			local _, current_mode = pcall(vim.fn.mode)
+			if current_mode ~= 'v' then
+				M.reset()
+			end
+		end
+	})
+
+	---Reset other highlights
 	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'InsertLeave', 'TextYankPost', 'WinLeave' },
+		{ 'CmdlineLeave', 'TextYankPost', 'WinLeave' },
 		{
 			pattern = '*',
 			callback = M.reset,
