@@ -179,12 +179,13 @@ M.define = function()
 	end
 
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
-		if colors[mode:lower()] ~= '' then
-			local def = { bg = blended_colors[mode:lower()] }
-			utils.set_hl(('Modes%sCursorLine'):format(mode), def)
-			utils.set_hl(('Modes%sCursorLineNr'):format(mode), def)
-			utils.set_hl(('Modes%sCursorLineSign'):format(mode), def)
-			utils.set_hl(('Modes%sCursorLineFold'):format(mode), def)
+		local mode_fg = colors[mode:lower()]
+		if mode_fg ~= '' then
+			local mode_bg = (mode:lower() == 'visual') and 'NONE' or blended_colors[mode:lower()]
+			utils.set_hl(('Modes%sCursorLine'):format(mode), { bg = mode_bg })
+			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg })
+			utils.set_hl(('Modes%sCursorLineSign'):format(mode), { bg = mode_bg })
+			utils.set_hl(('Modes%sCursorLineFold'):format(mode), { bg = mode_bg })
 		end
 	end
 
