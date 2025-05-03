@@ -125,6 +125,12 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesDelete' })
 		elseif scene == 'copy' then
 			utils.set_hl('ModesOperator', { link = 'ModesCopy' })
+		elseif scene == 'visual' then
+			utils.set_hl('ModesOperator', { link = 'ModesVisual' })
+		elseif scene == 'insert' then
+			utils.set_hl('ModesOperator', { link = 'ModesInsert' })
+		else
+			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
 	end
 end
@@ -169,6 +175,10 @@ M.define = function()
 	if colors.visual ~= '' then
 		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 	end
+
+	local default_operator = utils.get_bg('Cursor', '#524f67')
+	utils.set_hl('ModesDefault', { bg = default_operator })
+	utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 
 	local default_cursorline = utils.get_bg('CursorLine', '#26233a')
 	if config.set_number then
