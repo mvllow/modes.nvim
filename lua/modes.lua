@@ -63,8 +63,8 @@ local colors = {}
 local blended_colors = {}
 local operator_started = false
 local in_ignored_buffer = function()
-	return vim.api.nvim_buf_get_option(0, 'buftype') ~= '' -- not a normal buffer
-		or not vim.api.nvim_buf_get_option(0, 'buflisted') -- unlisted buffer
+	return vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
+		or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
 		or vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype)
 end
 
@@ -81,7 +81,7 @@ M.highlight = function(scene)
 	end
 
 	local winhl_map = {}
-	local prev_value = vim.api.nvim_win_get_option(0, 'winhighlight')
+	local prev_value = vim.api.nvim_get_option_value('winhighlight', { win = 0 })
 
 	-- mapping the old value of 'winhighlight'
 	if prev_value ~= '' then
@@ -108,9 +108,9 @@ M.highlight = function(scene)
 	for builtin, hl in pairs(winhl_map) do
 		table.insert(new_value, ('%s:%s'):format(builtin, hl))
 	end
-	vim.api.nvim_win_set_option(0, 'winhighlight', table.concat(new_value, ','))
+	vim.api.nvim_set_option_value('winhighlight', table.concat(new_value, ','), { win = 0 })
 
-	if vim.api.nvim_get_option('showmode') then
+	if vim.api.nvim_get_option_value('showmode', { scope = 'global' }) then
 		if scene == 'visual' then
 			utils.set_hl('ModeMsg', { link = 'ModesVisualModeMsg' })
 		elseif scene == 'insert' then
@@ -155,31 +155,29 @@ M.define = function()
 	}
 
 	---Create highlight groups
-	if colors.copy ~= "" then
+	if colors.copy ~= '' then
 		vim.cmd('hi ModesCopy guibg=' .. colors.copy)
 	end
-	if colors.delete ~= "" then
+	if colors.delete ~= '' then
 		vim.cmd('hi ModesDelete guibg=' .. colors.delete)
 	end
-	if colors.insert ~= "" then
+	if colors.insert ~= '' then
 		vim.cmd('hi ModesInsert guibg=' .. colors.insert)
 	end
-	if colors.visual ~= "" then
+	if colors.visual ~= '' then
 		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 	end
 
 	local default_cursorline = utils.get_bg('CursorLine', '#26233a')
-
 	if config.set_number then
 		vim.cmd('hi CursorLineNr guibg=' .. default_cursorline)
 	end
-
 	if config.set_signcolumn then
 		vim.cmd('hi CursorLineSign guibg=' .. default_cursorline)
 	end
 
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
-		if colors[mode:lower()] ~= "" then
+		if colors[mode:lower()] ~= '' then
 			local def = { bg = blended_colors[mode:lower()] }
 			utils.set_hl(('Modes%sCursorLine'):format(mode), def)
 			utils.set_hl(('Modes%sCursorLineNr'):format(mode), def)
@@ -188,10 +186,10 @@ M.define = function()
 		end
 	end
 
-	if colors.insert ~= "" then
+	if colors.insert ~= '' then
 		utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
 	end
-	if colors.visual ~= "" then
+	if colors.visual ~= '' then
 		utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
 		utils.set_hl('ModesVisualVisual', { bg = blended_colors.visual })
 	end
@@ -202,14 +200,13 @@ M.enable_managed_ui = function()
 		return
 	end
 
+	local cursor_hl = ',v-sm:ModesVisual,i-ci-ve:ModesInsert,r-cr-o:ModesOperator'
 	if config.set_cursor then
-		vim.opt.guicursor:append('v-sm:ModesVisual')
-		vim.opt.guicursor:append('i-ci-ve:ModesInsert')
-		vim.opt.guicursor:append('r-cr-o:ModesOperator')
+		vim.o.guicursor = vim.o.guicursor .. cursor_hl
 	end
 
 	if config.set_cursorline then
-		vim.opt.cursorline = true
+		vim.o.cursorline = true
 	end
 end
 
@@ -218,14 +215,13 @@ M.disable_managed_ui = function()
 		return
 	end
 
+	local cursor_hl = ',v%-sm:ModesVisual,i%-ci%-ve:ModesInsert,r%-cr%-o:ModesOperator'
 	if config.set_cursor then
-		vim.opt.guicursor:remove('v-sm:ModesVisual')
-		vim.opt.guicursor:remove('i-ci-ve:ModesInsert')
-		vim.opt.guicursor:remove('r-cr-o:ModesOperator')
+		vim.o.guicursor = vim.o.guicursor:gsub(cursor_hl, '')
 	end
 
 	if config.set_cursorline then
-		vim.opt.cursorline = false
+		vim.o.cursorline = false
 	end
 end
 
