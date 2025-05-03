@@ -115,6 +115,8 @@ M.highlight = function(scene)
 			utils.set_hl('ModeMsg', { link = 'ModesVisualModeMsg' })
 		elseif scene == 'insert' then
 			utils.set_hl('ModeMsg', { link = 'ModesInsertModeMsg' })
+		else
+			utils.set_hl('ModeMsg', { link = 'ModesDefaultModeMsg' })
 		end
 	end
 
@@ -185,6 +187,9 @@ M.define = function()
 			utils.set_hl(('Modes%sCursorLineFold'):format(mode), def)
 		end
 	end
+
+	local default_mode_msg = utils.get_fg('ModeMsg', '#908caa')
+	utils.set_hl('ModesDefaultModeMsg', { fg = default_mode_msg })
 
 	if colors.insert ~= '' then
 		utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
@@ -311,17 +316,14 @@ M.setup = function(opts)
 		}
 	)
 
-	---Enable managed UI initially
-	M.enable_managed_ui()
-
-	---Enable managed UI for current window
-	vim.api.nvim_create_autocmd('WinEnter', {
+	---Enable managed UI
+	vim.api.nvim_create_autocmd('BufEnter', {
 		pattern = '*',
 		callback = M.enable_managed_ui,
 	})
 
-	---Disable managed UI for unfocused windows
-	vim.api.nvim_create_autocmd('WinLeave', {
+	---Disable managed UI
+	vim.api.nvim_create_autocmd('BufLeave', {
 		pattern = '*',
 		callback = M.disable_managed_ui,
 	})
