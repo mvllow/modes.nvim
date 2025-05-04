@@ -338,8 +338,11 @@ M.setup = function(opts)
 		}
 	)
 
-	---Enable managed UI
-	vim.api.nvim_create_autocmd('BufEnter', {
+	---Enable managed UI initially
+	M.enable_managed_ui()
+
+	---Enable managed UI for current window
+	vim.api.nvim_create_autocmd('WinEnter', {
 		pattern = '*',
 		callback = M.enable_managed_ui,
 	})
