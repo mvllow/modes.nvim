@@ -73,7 +73,6 @@ M.get_fg = function(name, fallback)
 
 	return foreground
 end
-
 M.get_bg = function(name, fallback)
 	local id = vim.api.nvim_get_hl_id_by_name(name)
 	if not id then
