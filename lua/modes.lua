@@ -216,9 +216,13 @@ M.enable_managed_ui = function()
 		return
 	end
 
-	local cursor_hl = ',v-sm:ModesVisual,i-ci-ve:ModesInsert,r-cr-o:ModesOperator'
+	local cursor_hl = 'v-sm:ModesVisual,i-ci-ve:ModesInsert,r-cr-o:ModesOperator'
 	if config.set_cursor then
-		vim.o.guicursor = vim.o.guicursor .. cursor_hl
+		if vim.o.guicursor == '' then
+			vim.o.guicursor = cursor_hl
+		else
+			vim.o.guicursor = vim.o.guicursor .. ',' .. cursor_hl
+		end
 	end
 
 	if config.set_cursorline then
