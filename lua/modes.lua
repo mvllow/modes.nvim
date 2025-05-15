@@ -358,7 +358,9 @@ M.setup = function(opts)
 	---Enable managed UI for current window
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
-		callback = M.enable_managed_ui,
+		callback = function()
+			vim.schedule(M.enable_managed_ui)
+		end,
 	})
 
 	---Disable managed UI
