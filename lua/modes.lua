@@ -213,35 +213,37 @@ end
 
 M.enable_managed_ui = function()
 	if in_ignored_buffer() then
-		return
-	end
-
-	local cursor_hl = 'v-sm:ModesVisual,i-ci-ve:ModesInsert,r-cr-o:ModesOperator'
-	if config.set_cursor then
-		if vim.o.guicursor == '' then
-			vim.o.guicursor = cursor_hl
-		else
-			vim.o.guicursor = vim.o.guicursor .. ',' .. cursor_hl
+		if config.set_cursorline then
+			vim.o.cursorline = false
 		end
-	end
+	else
+		if config.set_cursorline then
+			vim.o.cursorline = true
+		end
 
-	if config.set_cursorline then
-		vim.o.cursorline = true
+		if config.set_cursor then
+			vim.opt.guicursor:append('v-sm:ModesVisual')
+			vim.opt.guicursor:append('i-ci-ve:ModesInsert')
+			vim.opt.guicursor:append('r-cr-o:ModesOperator')
+		end
 	end
 end
 
 M.disable_managed_ui = function()
-	if in_ignored_buffer() then
-		return
-	end
-
-	local cursor_hl = ',v%-sm:ModesVisual,i%-ci%-ve:ModesInsert,r%-cr%-o:ModesOperator'
-	if config.set_cursor then
-		vim.o.guicursor = vim.o.guicursor:gsub(cursor_hl, '')
-	end
-
 	if config.set_cursorline then
 		vim.o.cursorline = false
+	end
+
+	if config.set_cursor then
+		vim.opt.guicursor:remove('v-sm:ModesVisual')
+		vim.opt.guicursor:remove('i-ci-ve:ModesInsert')
+		vim.opt.guicursor:remove('r-cr-o:ModesOperator')
+
+		-- ensure cursor reset (see https://github.com/neovim/neovim/issues/21018)
+		local cursor = vim.o.guicursor
+		vim.o.guicursor = 'a:'
+		vim.cmd.redrawstatus()
+		vim.o.guicursor = cursor
 	end
 end
 
@@ -330,7 +332,7 @@ M.setup = function(opts)
 			if current_mode ~= 'v' then
 				M.reset()
 			end
-		end
+		end,
 	})
 
 	---Reset other highlights
