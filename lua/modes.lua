@@ -337,24 +337,21 @@ M.setup = function(opts)
 
 	---Reset other highlights
 	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'TextYankPost', 'WinLeave' },
+		{ 'CmdlineLeave', 'TextYankPost', 'WinLeave', 'FocusLost' },
 		{
 			pattern = '*',
 			callback = M.reset,
 		}
 	)
 
-	---Enable managed UI initially
-	M.enable_managed_ui()
-
 	---Enable managed UI for current window
-	vim.api.nvim_create_autocmd('WinEnter', {
+	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
 		callback = M.enable_managed_ui,
 	})
 
 	---Disable managed UI
-	vim.api.nvim_create_autocmd('BufLeave', {
+	vim.api.nvim_create_autocmd({ 'WinLeave', 'FocusLost' }, {
 		pattern = '*',
 		callback = M.disable_managed_ui,
 	})
