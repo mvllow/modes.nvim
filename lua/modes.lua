@@ -278,7 +278,7 @@ M.setup = function(opts)
 		if current_mode == 'n' then
 			-- reset if coming back from operator pending mode
 			if operator_started then
-				M.reset()
+				vim.schedule(M.reset)
 				return
 			end
 
