@@ -344,6 +344,17 @@ M.setup = function(opts)
 		}
 	)
 
+	---Restore insert highlight
+	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
+		pattern = '*',
+		callback = function()
+			local _, current_mode = pcall(vim.fn.mode)
+			if current_mode == 'i' or current_mode == 'R' then
+				M.highlight('insert')
+			end
+		end,
+	})
+
 	---Enable managed UI for current window
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
