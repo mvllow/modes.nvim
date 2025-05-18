@@ -328,8 +328,8 @@ M.setup = function(opts)
 	vim.api.nvim_create_autocmd('InsertLeave', {
 		pattern = '*',
 		callback = function()
-			local _, current_mode = pcall(vim.fn.mode)
-			if current_mode ~= 'v' then
+			local mode = vim.api.nvim_get_mode().mode
+			if mode ~= 'v' then
 				M.reset()
 			end
 		end,
@@ -348,8 +348,8 @@ M.setup = function(opts)
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
 		callback = function()
-			local _, current_mode = pcall(vim.fn.mode)
-			if current_mode == 'i' or current_mode == 'R' then
+			local mode = vim.api.nvim_get_mode().mode
+			if mode == 'i' or mode == 'R' then
 				M.highlight('insert')
 			end
 		end,
