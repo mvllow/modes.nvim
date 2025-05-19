@@ -61,7 +61,6 @@ local winhighlight = {
 }
 local colors = {}
 local blended_colors = {}
-local operator_started = false
 local in_ignored_buffer = function()
 	return vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
 		or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
@@ -70,7 +69,6 @@ end
 
 M.reset = function()
 	M.highlight('default')
-	operator_started = false
 end
 
 ---Update highlights
@@ -269,29 +267,14 @@ M.setup = function(opts)
 	M.define()
 
 	vim.on_key(function(key)
-		local ok, current_mode = pcall(vim.fn.mode)
-		if not ok then
-			M.reset()
-			return
-		end
-
-		if current_mode == 'n' then
-			-- reset if coming back from operator pending mode
-			if operator_started then
-				vim.schedule(M.reset)
-				return
-			end
-
+		local mode = vim.api.nvim_get_mode().mode
+		if mode == 'no' then
+			vim.schedule(M.reset)
+		elseif mode == 'n' then
 			if key == 'y' then
 				M.highlight('copy')
-				operator_started = true
-				return
-			end
-
-			if key == 'd' then
+			elseif key == 'd' then
 				M.highlight('delete')
-				operator_started = true
-				return
 			end
 		end
 	end)
