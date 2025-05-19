@@ -69,6 +69,7 @@ end
 
 M.reset = function()
 	M.highlight('default')
+	vim.cmd.redraw()
 end
 
 ---Update highlights
