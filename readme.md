@@ -16,6 +16,10 @@ use({
 
 ![modes.nvim](https://user-images.githubusercontent.com/1474821/127896095-6da221cf-3327-4eed-82be-ce419bdf647c.gif)
 
+## Requirements
+
+- **Neovim 0.11** or later
+
 ## Options
 
 ```lua
