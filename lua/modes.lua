@@ -14,7 +14,7 @@ local default_config = {
 	set_cursorline = true,
 	set_number = true,
 	set_signcolumn = true,
-	ignore_filetypes = {
+	ignore_contexts = {
 		'NvimTree',
 		'lspinfo',
 		'packer',
@@ -23,6 +23,7 @@ local default_config = {
 		'man',
 		'TelescopePrompt',
 		'TelescopeResults',
+		'!minifiles',
 	},
 }
 local winhighlight = {
@@ -62,9 +63,13 @@ local winhighlight = {
 local colors = {}
 local blended_colors = {}
 local in_ignored_buffer = function()
-	return vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
-		or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
-		or vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype)
+	if type(config.ignore_contexts) == 'function' then
+		return config.ignore_contexts()
+	end
+	return not vim.tbl_contains(config.ignore_contexts, '!' .. vim.bo.filetype)
+		 and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
+			 or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
+			 or vim.tbl_contains(config.ignore_contexts, vim.bo.filetype))
 end
 
 M.reset = function()
@@ -251,6 +256,15 @@ M.setup = function(opts)
 	if opts.focus_only then
 		print(
 			'modes.nvim – `focus_only` has been removed and is now the default behaviour'
+		)
+	end
+	if opts.ignore_filetypes then
+		if not opts.ignore_contexts then
+			opts.ignore_contexts = opts.ignore_filetypes
+		end
+		opts.ignore_filetypes = nil
+		print(
+			'modes.nvim - `ignore_filetypes` has been replaced by `ignore_contexts`'
 		)
 	end
 
