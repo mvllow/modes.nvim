@@ -48,9 +48,10 @@ require('modes').setup({
 	-- Enable sign column highlights to match cursorline
 	set_signcolumn = true,
 
-	-- Disable modes highlights in specified filetypes
-	-- Please PR commonly ignored filetypes
-	ignore_filetypes = { 'NvimTree', 'TelescopePrompt' }
+	-- Disable modes highlights for specified filetypes
+	-- or enable with prefix "!" if otherwise disabled (please PR common patterns)
+	-- Can also be a function fun():boolean that disables modes highlights when true
+	ignore_contexts = { 'NvimTree', 'TelescopePrompt', '!minifiles' }
 })
 ```
 
