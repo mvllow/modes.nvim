@@ -227,8 +227,8 @@ M.enable_managed_ui = function()
 
 		if config.set_cursor then
 			vim.opt.guicursor:append('v-sm:ModesVisual')
-			vim.opt.guicursor:append('i-ve:ModesInsert')
-			vim.opt.guicursor:append('r-o:ModesOperator')
+			vim.opt.guicursor:append('i-ci-ve:ModesInsert')
+			vim.opt.guicursor:append('r-cr-o:ModesOperator')
 		end
 	end
 end
@@ -240,8 +240,8 @@ M.disable_managed_ui = function()
 
 	if config.set_cursor then
 		vim.opt.guicursor:remove('v-sm:ModesVisual')
-		vim.opt.guicursor:remove('i-ve:ModesInsert')
-		vim.opt.guicursor:remove('r-o:ModesOperator')
+		vim.opt.guicursor:remove('i-ci-ve:ModesInsert')
+		vim.opt.guicursor:remove('r-cr-o:ModesOperator')
 
 		-- ensure cursor reset (see https://github.com/neovim/neovim/issues/21018)
 		local cursor = vim.o.guicursor
