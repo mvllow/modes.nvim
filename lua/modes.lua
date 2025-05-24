@@ -254,8 +254,10 @@ end
 M.setup = function(opts)
 	opts = vim.tbl_extend('keep', opts or {}, default_config)
 	if opts.focus_only then
-		print(
-			'modes.nvim – `focus_only` has been removed and is now the default behaviour'
+		vim.notify(
+			'modes.nvim – `focus_only` has been removed and is now the default behaviour',
+			vim.log.levels.INFO,
+			{}
 		)
 	end
 	if opts.ignore_filetypes then
@@ -263,8 +265,10 @@ M.setup = function(opts)
 			opts.ignore = opts.ignore_filetypes
 		end
 		opts.ignore_filetypes = nil
-		print(
-			'modes.nvim - `ignore_filetypes` has been replaced by `ignore`'
+		vim.notify(
+			'modes.nvim - `ignore_filetypes` has been replaced by `ignore`',
+			vim.log.levels.INFO,
+			{}
 		)
 	end
 
