@@ -14,7 +14,7 @@ local default_config = {
 	set_cursorline = true,
 	set_number = true,
 	set_signcolumn = true,
-	ignore_filetypes = {
+	ignore = {
 		'NvimTree',
 		'lspinfo',
 		'packer',
@@ -23,6 +23,7 @@ local default_config = {
 		'man',
 		'TelescopePrompt',
 		'TelescopeResults',
+		'!minifiles',
 	},
 }
 local winhighlight = {
@@ -62,9 +63,13 @@ local winhighlight = {
 local colors = {}
 local blended_colors = {}
 local in_ignored_buffer = function()
-	return vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
-		or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
-		or vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype)
+	if type(config.ignore) == 'function' then
+		return config.ignore()
+	end
+	return not vim.tbl_contains(config.ignore, '!' .. vim.bo.filetype)
+		 and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
+			 or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
+			 or vim.tbl_contains(config.ignore, vim.bo.filetype))
 end
 
 M.reset = function()
@@ -249,8 +254,21 @@ end
 M.setup = function(opts)
 	opts = vim.tbl_extend('keep', opts or {}, default_config)
 	if opts.focus_only then
-		print(
-			'modes.nvim – `focus_only` has been removed and is now the default behaviour'
+		vim.notify(
+			'modes.nvim – `focus_only` has been removed and is now the default behaviour',
+			vim.log.levels.INFO,
+			{}
+		)
+	end
+	if opts.ignore_filetypes then
+		if not opts.ignore then
+			opts.ignore = opts.ignore_filetypes
+		end
+		opts.ignore_filetypes = nil
+		vim.notify(
+			'modes.nvim - `ignore_filetypes` has been replaced by `ignore`',
+			vim.log.levels.INFO,
+			{}
 		)
 	end
 
