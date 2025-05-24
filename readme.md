@@ -51,7 +51,7 @@ require('modes').setup({
 	-- Disable modes highlights for specified filetypes
 	-- or enable with prefix "!" if otherwise disabled (please PR common patterns)
 	-- Can also be a function fun():boolean that disables modes highlights when true
-	ignore_contexts = { 'NvimTree', 'TelescopePrompt', '!minifiles' }
+	ignore = { 'NvimTree', 'TelescopePrompt', '!minifiles' }
 })
 ```
 
