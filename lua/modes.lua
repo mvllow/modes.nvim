@@ -14,7 +14,7 @@ local default_config = {
 	set_cursorline = true,
 	set_number = true,
 	set_signcolumn = true,
-	ignore_contexts = {
+	ignore = {
 		'NvimTree',
 		'lspinfo',
 		'packer',
@@ -63,13 +63,13 @@ local winhighlight = {
 local colors = {}
 local blended_colors = {}
 local in_ignored_buffer = function()
-	if type(config.ignore_contexts) == 'function' then
-		return config.ignore_contexts()
+	if type(config.ignore) == 'function' then
+		return config.ignore()
 	end
-	return not vim.tbl_contains(config.ignore_contexts, '!' .. vim.bo.filetype)
+	return not vim.tbl_contains(config.ignore, '!' .. vim.bo.filetype)
 		 and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
 			 or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
-			 or vim.tbl_contains(config.ignore_contexts, vim.bo.filetype))
+			 or vim.tbl_contains(config.ignore, vim.bo.filetype))
 end
 
 M.reset = function()
@@ -259,12 +259,12 @@ M.setup = function(opts)
 		)
 	end
 	if opts.ignore_filetypes then
-		if not opts.ignore_contexts then
-			opts.ignore_contexts = opts.ignore_filetypes
+		if not opts.ignore then
+			opts.ignore = opts.ignore_filetypes
 		end
 		opts.ignore_filetypes = nil
 		print(
-			'modes.nvim - `ignore_filetypes` has been replaced by `ignore_contexts`'
+			'modes.nvim - `ignore_filetypes` has been replaced by `ignore`'
 		)
 	end
 
