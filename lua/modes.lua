@@ -215,7 +215,7 @@ M.define = function()
 	end
 end
 
-M.enable_managed_ui = function()
+M.enable_managed_ui = vim.schedule_wrap(function()
 	if in_ignored_buffer() then
 		if config.set_cursorline then
 			vim.o.cursorline = false
@@ -230,8 +230,14 @@ M.enable_managed_ui = function()
 			vim.opt.guicursor:append('i-ve:ModesInsert')
 			vim.opt.guicursor:append('r-o:ModesOperator')
 		end
+
+		-- restore insert highlight
+		local mode = vim.api.nvim_get_mode().mode
+		if mode:match('^i') or mode:match('^R') then
+			M.highlight('insert')
+		end
 	end
-end
+end)
 
 M.disable_managed_ui = function()
 	if config.set_cursorline then
@@ -249,6 +255,8 @@ M.disable_managed_ui = function()
 		vim.cmd.redrawstatus()
 		vim.o.guicursor = cursor
 	end
+
+	M.reset()
 end
 
 M.setup = function(opts)
@@ -325,32 +333,10 @@ M.setup = function(opts)
 		end,
 	})
 
-	---Reset other highlights
-	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'TextYankPost', 'WinLeave', 'FocusLost' },
-		{
-			pattern = '*',
-			callback = M.reset,
-		}
-	)
-
-	---Restore insert highlight
-	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
-		pattern = '*',
-		callback = function()
-			local mode = vim.api.nvim_get_mode().mode
-			if mode:match('^i') or mode:match('^R') then
-				M.highlight('insert')
-			end
-		end,
-	})
-
 	---Enable managed UI for current window
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
-		callback = function()
-			vim.schedule(M.enable_managed_ui)
-		end,
+		callback = M.enable_managed_ui,
 	})
 
 	---Disable managed UI
