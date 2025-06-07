@@ -285,18 +285,23 @@ M.setup = function(opts)
 
 	M.define()
 
-	vim.on_key(function(key)
-		local mode = vim.api.nvim_get_mode().mode
-		if mode == 'no' then
-			vim.schedule(M.reset)
-		elseif mode == 'n' then
-			if key == 'y' then
+	---Reset normal highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:n,*:ni*',
+		callback = M.reset,
+	})
+
+	---Set operator highlights
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:no*',
+		callback = function()
+			if vim.v.operator == 'y' then
 				M.highlight('copy')
-			elseif key == 'd' then
+			elseif vim.v.operator == 'd' then
 				M.highlight('delete')
 			end
-		end
-	end)
+		end,
+	})
 
 	---Set highlights when colorscheme changes
 	vim.api.nvim_create_autocmd('ColorScheme', {
@@ -317,23 +322,6 @@ M.setup = function(opts)
 		pattern = '*:[vV\x16]',
 		callback = function()
 			M.highlight('visual')
-		end,
-	})
-
-	---Reset visual highlight
-	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '[vV\x16]:n',
-		callback = M.reset,
-	})
-
-	---Reset insert highlight (unless entering visual mode)
-	vim.api.nvim_create_autocmd('InsertLeave', {
-		pattern = '*',
-		callback = function()
-			local mode = vim.api.nvim_get_mode().mode
-			if mode ~= 'v' then
-				M.reset()
-			end
 		end,
 	})
 
