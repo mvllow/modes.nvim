@@ -215,7 +215,7 @@ M.define = function()
 	end
 end
 
-M.enable_managed_ui = function()
+M.enable_managed_ui = vim.schedule_wrap(function()
 	if in_ignored_buffer() then
 		if config.set_cursorline then
 			vim.o.cursorline = false
@@ -230,8 +230,14 @@ M.enable_managed_ui = function()
 			vim.opt.guicursor:append('i-ve:ModesInsert')
 			vim.opt.guicursor:append('r-o:ModesOperator')
 		end
+
+		-- restore insert highlight
+		local mode = vim.api.nvim_get_mode().mode
+		if mode:match('^i') or mode:match('^R') then
+			M.highlight('insert')
+		end
 	end
-end
+end)
 
 M.disable_managed_ui = function()
 	if config.set_cursorline then
@@ -249,6 +255,8 @@ M.disable_managed_ui = function()
 		vim.cmd.redrawstatus()
 		vim.o.guicursor = cursor
 	end
+
+	M.reset()
 end
 
 M.setup = function(opts)
@@ -285,18 +293,23 @@ M.setup = function(opts)
 
 	M.define()
 
-	vim.on_key(function(key)
-		local mode = vim.api.nvim_get_mode().mode
-		if mode == 'no' then
-			vim.schedule(M.reset)
-		elseif mode == 'n' then
-			if key == 'y' then
+	---Reset normal highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:n,*:ni*',
+		callback = M.reset,
+	})
+
+	---Set operator highlights
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:no*',
+		callback = function()
+			if vim.v.operator == 'y' then
 				M.highlight('copy')
-			elseif key == 'd' then
+			elseif vim.v.operator == 'd' then
 				M.highlight('delete')
 			end
-		end
-	end)
+		end,
+	})
 
 	---Set highlights when colorscheme changes
 	vim.api.nvim_create_autocmd('ColorScheme', {
@@ -314,55 +327,16 @@ M.setup = function(opts)
 
 	---Set visual highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '*:[vV\x16]',
+		pattern = '*:[vV\x16]*,*:[sS\x13]',
 		callback = function()
 			M.highlight('visual')
-		end,
-	})
-
-	---Reset visual highlight
-	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '[vV\x16]:n',
-		callback = M.reset,
-	})
-
-	---Reset insert highlight (unless entering visual mode)
-	vim.api.nvim_create_autocmd('InsertLeave', {
-		pattern = '*',
-		callback = function()
-			local mode = vim.api.nvim_get_mode().mode
-			if mode ~= 'v' then
-				M.reset()
-			end
-		end,
-	})
-
-	---Reset other highlights
-	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'TextYankPost', 'WinLeave', 'FocusLost' },
-		{
-			pattern = '*',
-			callback = M.reset,
-		}
-	)
-
-	---Restore insert highlight
-	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
-		pattern = '*',
-		callback = function()
-			local mode = vim.api.nvim_get_mode().mode
-			if mode == 'i' or mode == 'R' then
-				M.highlight('insert')
-			end
 		end,
 	})
 
 	---Enable managed UI for current window
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
-		callback = function()
-			vim.schedule(M.enable_managed_ui)
-		end,
+		callback = M.enable_managed_ui,
 	})
 
 	---Disable managed UI
