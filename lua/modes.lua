@@ -319,7 +319,7 @@ M.setup = function(opts)
 
 	---Set visual highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '*:[vV\x16]',
+		pattern = '*:[vV\x16]*,*:[sS\x13]',
 		callback = function()
 			M.highlight('visual')
 		end,
@@ -339,7 +339,7 @@ M.setup = function(opts)
 		pattern = '*',
 		callback = function()
 			local mode = vim.api.nvim_get_mode().mode
-			if mode == 'i' or mode == 'R' then
+			if mode:match('^i') or mode:match('^R') then
 				M.highlight('insert')
 			end
 		end,
