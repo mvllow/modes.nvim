@@ -77,6 +77,11 @@ M.reset = function()
 	vim.cmd.redraw()
 end
 
+M.restore = function()
+	local scene = M.get_scene()
+	M.highlight(scene)
+end
+
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
@@ -137,6 +142,29 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
 	end
+end
+
+M.get_scene = function()
+	local mode = vim.api.nvim_get_mode().mode
+	if mode:match('^i') or mode:match('^R') then
+		return 'insert'
+	end
+	
+	local visual_modes = {
+		v = true,
+		V = true,
+		['\x16'] = true,
+	}
+	local select_modes = {
+		s = true,
+		S = true,
+		['\x13'] = true,
+	}
+	if (visual_modes[mode:sub(1, 1)] or select_modes[mode]) then
+		return 'visual'
+	end
+	
+	return 'default'
 end
 
 M.define = function()
@@ -231,11 +259,7 @@ M.enable_managed_ui = vim.schedule_wrap(function()
 			vim.opt.guicursor:append('r-o:ModesOperator')
 		end
 
-		-- restore insert highlight
-		local mode = vim.api.nvim_get_mode().mode
-		if mode:match('^i') or mode:match('^R') then
-			M.highlight('insert')
-		end
+		M.restore()
 	end
 end)
 
