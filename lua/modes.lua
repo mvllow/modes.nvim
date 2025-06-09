@@ -149,7 +149,7 @@ M.get_scene = function()
 	if mode:match('^i') or mode:match('^R') then
 		return 'insert'
 	end
-	
+
 	local visual_modes = {
 		v = true,
 		V = true,
@@ -163,7 +163,7 @@ M.get_scene = function()
 	if (visual_modes[mode:sub(1, 1)] or select_modes[mode]) then
 		return 'visual'
 	end
-	
+
 	return 'default'
 end
 
