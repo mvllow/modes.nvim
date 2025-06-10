@@ -146,21 +146,10 @@ end
 
 M.get_scene = function()
 	local mode = vim.api.nvim_get_mode().mode
-	if mode:match('^i') or mode:match('^R') then
+	if mode:match('[iR]') then
 		return 'insert'
 	end
-
-	local visual_modes = {
-		v = true,
-		V = true,
-		['\x16'] = true,
-	}
-	local select_modes = {
-		s = true,
-		S = true,
-		['\x13'] = true,
-	}
-	if (visual_modes[mode:sub(1, 1)] or select_modes[mode]) then
+	if mode:match('[vVsS\x16\x13]') then
 		return 'visual'
 	end
 
@@ -351,7 +340,7 @@ M.setup = function(opts)
 
 	---Set visual highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '*:[vV\x16]*,*:[sS\x13]',
+		pattern = '*:[vVsS\x16\x13]',
 		callback = function()
 			M.highlight('visual')
 		end,
