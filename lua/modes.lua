@@ -78,8 +78,14 @@ M.reset = function()
 end
 
 M.restore = function()
-	local scene = M.get_scene()
-	M.highlight(scene)
+	local mode = vim.api.nvim_get_mode().mode
+	if mode:match('[iR]') then
+		M.highlight('insert')
+	elseif mode:match('[vVsS\x16\x13]') then
+		M.highlight('visual')
+	else
+		M.highlight('default')
+	end
 end
 
 ---Update highlights
@@ -142,18 +148,6 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
 	end
-end
-
-M.get_scene = function()
-	local mode = vim.api.nvim_get_mode().mode
-	if mode:match('[iR]') then
-		return 'insert'
-	end
-	if mode:match('[vVsS\x16\x13]') then
-		return 'visual'
-	end
-
-	return 'default'
 end
 
 M.define = function()
