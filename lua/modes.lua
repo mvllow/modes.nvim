@@ -203,12 +203,13 @@ M.define = function()
 		vim.cmd('hi CursorLineSign guibg=' .. default_cursorline)
 	end
 
+	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
-			local mode_bg = (mode:lower() == 'visual') and 'NONE' or blended_colors[mode:lower()]
+			local mode_bg = (mode:lower() == 'visual') and 'none' or blended_colors[mode:lower()]
 			utils.set_hl(('Modes%sCursorLine'):format(mode), { bg = mode_bg })
-			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg })
+			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg, gui = line_nr_gui })
 			utils.set_hl(('Modes%sCursorLineSign'):format(mode), { bg = mode_bg })
 			utils.set_hl(('Modes%sCursorLineFold'):format(mode), { bg = mode_bg })
 		end
