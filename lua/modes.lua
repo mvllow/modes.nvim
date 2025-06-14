@@ -226,7 +226,7 @@ M.define = function()
 	end
 end
 
-M.enable_managed_ui = vim.schedule_wrap(function()
+M.enable_managed_ui = function()
 	if in_ignored_buffer() then
 		if config.set_cursorline then
 			vim.o.cursorline = false
@@ -244,7 +244,7 @@ M.enable_managed_ui = vim.schedule_wrap(function()
 
 		M.restore()
 	end
-end)
+end
 
 M.disable_managed_ui = function()
 	if config.set_cursorline then
@@ -343,7 +343,9 @@ M.setup = function(opts)
 	---Enable managed UI for current window
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
-		callback = M.enable_managed_ui,
+		callback = function()
+			vim.schedule(M.enable_managed_ui)
+		end,
 	})
 
 	---Disable managed UI
