@@ -77,6 +77,17 @@ M.reset = function()
 	vim.cmd.redraw()
 end
 
+M.restore = function()
+	local mode = vim.api.nvim_get_mode().mode
+	if mode:match('[iR]') then
+		M.highlight('insert')
+	elseif mode:match('[vVsS\x16\x13]') then
+		M.highlight('visual')
+	else
+		M.highlight('default')
+	end
+end
+
 ---Update highlights
 ---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
 M.highlight = function(scene)
@@ -230,6 +241,8 @@ M.enable_managed_ui = function()
 			vim.opt.guicursor:append('i-ve:ModesInsert')
 			vim.opt.guicursor:append('r-o:ModesOperator')
 		end
+
+		M.restore()
 	end
 end
 
@@ -249,6 +262,8 @@ M.disable_managed_ui = function()
 		vim.cmd.redrawstatus()
 		vim.o.guicursor = cursor
 	end
+
+	M.reset()
 end
 
 M.setup = function(opts)
@@ -285,18 +300,23 @@ M.setup = function(opts)
 
 	M.define()
 
-	vim.on_key(function(key)
-		local mode = vim.api.nvim_get_mode().mode
-		if mode == 'no' then
-			vim.schedule(M.reset)
-		elseif mode == 'n' then
-			if key == 'y' then
+	---Reset normal highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:n,*:ni*',
+		callback = M.reset,
+	})
+
+	---Set operator highlights
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:no*',
+		callback = function()
+			if vim.v.operator == 'y' then
 				M.highlight('copy')
-			elseif key == 'd' then
+			elseif vim.v.operator == 'd' then
 				M.highlight('delete')
 			end
-		end
-	end)
+		end,
+	})
 
 	---Set highlights when colorscheme changes
 	vim.api.nvim_create_autocmd('ColorScheme', {
@@ -314,46 +334,9 @@ M.setup = function(opts)
 
 	---Set visual highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '*:[vV\x16]',
+		pattern = '*:[vVsS\x16\x13]',
 		callback = function()
 			M.highlight('visual')
-		end,
-	})
-
-	---Reset visual highlight
-	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '[vV\x16]:n',
-		callback = M.reset,
-	})
-
-	---Reset insert highlight (unless entering visual mode)
-	vim.api.nvim_create_autocmd('InsertLeave', {
-		pattern = '*',
-		callback = function()
-			local mode = vim.api.nvim_get_mode().mode
-			if mode ~= 'v' then
-				M.reset()
-			end
-		end,
-	})
-
-	---Reset other highlights
-	vim.api.nvim_create_autocmd(
-		{ 'CmdlineLeave', 'TextYankPost', 'WinLeave', 'FocusLost' },
-		{
-			pattern = '*',
-			callback = M.reset,
-		}
-	)
-
-	---Restore insert highlight
-	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
-		pattern = '*',
-		callback = function()
-			local mode = vim.api.nvim_get_mode().mode
-			if mode == 'i' or mode == 'R' then
-				M.highlight('insert')
-			end
 		end,
 	})
 
