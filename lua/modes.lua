@@ -164,7 +164,7 @@ M.define = function()
 		bg = config.colors.bg or utils.get_bg('Normal', 'Normal'),
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
-		change = config.colors.change or utils.get_bg('ModesChange', colors.delete),
+		change = config.colors.change or utils.get_bg('ModesChange', '#40e0d0'),
 		insert = config.colors.insert or utils.get_bg('ModesInsert', '#78ccc5'),
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
