@@ -27,6 +27,7 @@ require('modes').setup({
 	colors = {
 		bg = "", -- Optional bg param, defaults to Normal hl group
 		copy = "#f5c359",
+		change = "#40e0d0"
 		delete = "#c75c6a",
 		insert = "#78ccc5",
 		visual = "#9745be",
@@ -61,6 +62,7 @@ require('modes').setup({
 | --------------- | --------------- |
 | `ModesCopy`     | `guibg=#f5c359` |
 | `ModesDelete`   | `guibg=#c75c6a` |
+| `ModesChange`   | `guibg=#40e0d0` |
 | `ModesInsert`   | `guibg=#78ccc5` |
 | `ModesVisual`   | `guibg=#9745be` |
 
