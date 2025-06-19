@@ -167,8 +167,6 @@ M.define = function()
 		insert = config.colors.insert or utils.get_bg('ModesInsert', '#78ccc5'),
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
-
-	-- c mode colors defaults to delete
 	colors.change = config.colors.change or colors.delete
 
 	blended_colors = {
