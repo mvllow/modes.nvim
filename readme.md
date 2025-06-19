@@ -62,7 +62,7 @@ require('modes').setup({
 | --------------- | --------------- |
 | `ModesCopy`     | `guibg=#f5c359` |
 | `ModesDelete`   | `guibg=#c75c6a` |
-| `ModesChange`   | `ModesDelete` |
+| `ModesChange`   | `ModesDelete`   |
 | `ModesInsert`   | `guibg=#78ccc5` |
 | `ModesVisual`   | `guibg=#9745be` |
 
