@@ -314,6 +314,7 @@ M.setup = function(opts)
 	end
 
 	M.define()
+	M.enable_managed_ui() -- ensure enabled initially
 
 	---Reset normal highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
