@@ -78,18 +78,12 @@ M.reset = function()
 end
 
 M.restore = function()
-	local mode = vim.api.nvim_get_mode().mode
-	if mode:match('[iR]') then
-		M.highlight('insert')
-	elseif mode:match('[vVsS\x16\x13]') then
-		M.highlight('visual')
-	else
-		M.highlight('default')
-	end
+	local scene = M.get_scene()
+	M.highlight(scene)
 end
 
 ---Update highlights
----@param scene 'default'|'insert'|'visual'|'copy'|'delete'|
+---@param scene 'default'|'insert'|'visual'|'copy'|'delete'
 M.highlight = function(scene)
 	if in_ignored_buffer() then
 		return
@@ -113,6 +107,11 @@ M.highlight = function(scene)
 
 	if not config.set_number then
 		winhl_map.CursorLineNr = nil
+	elseif not config.set_cursorline then
+		local detected_scene = M.get_scene()
+		if scene == 'default' and detected_scene == 'visual' then
+			winhl_map.CursorLineNr = 'ModesVisualUnfocusedCursorLineNr'
+		end
 	end
 
 	if not config.set_signcolumn then
@@ -148,6 +147,18 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
 	end
+end
+
+M.get_scene = function()
+	local mode = vim.api.nvim_get_mode().mode
+	if mode:match('[iR]') then
+		return 'insert'
+	end
+	if mode:match('[vVsS\x16\x13]') then
+		return 'visual'
+	end
+
+	return 'default'
 end
 
 M.define = function()
@@ -203,16 +214,20 @@ M.define = function()
 		vim.cmd('hi CursorLineSign guibg=' .. default_cursorline)
 	end
 
+	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
-			local mode_bg = (mode:lower() == 'visual') and 'NONE' or blended_colors[mode:lower()]
+			local mode_bg = (mode:lower() == 'visual') and 'none' or blended_colors[mode:lower()]
 			utils.set_hl(('Modes%sCursorLine'):format(mode), { bg = mode_bg })
-			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg })
+			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg, gui = line_nr_gui })
 			utils.set_hl(('Modes%sCursorLineSign'):format(mode), { bg = mode_bg })
 			utils.set_hl(('Modes%sCursorLineFold'):format(mode), { bg = mode_bg })
 		end
 	end
+
+	local default_line_nr = utils.get_fg('CursorLineNr', 'Normal')
+	utils.set_hl('ModesVisualUnfocusedCursorLineNr', { fg = default_line_nr, gui = line_nr_gui })
 
 	local default_mode_msg = utils.get_fg('ModeMsg', '#908caa')
 	utils.set_hl('ModesDefaultModeMsg', { fg = default_mode_msg })

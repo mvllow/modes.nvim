@@ -20,7 +20,7 @@ local get_color = function(name)
 	return { byte(color, 16), byte(color, 8), byte(color, 0) }
 end
 
----Get visually transparent volour
+---Get visually transparent colour
 ---@param fg string like 'pink' or '#fa8072'
 ---@param bg string like 'pink' or '#fa8072'
 ---@param alpha integer number between 0 and 1
@@ -42,6 +42,7 @@ end
 ---@class Color
 ---@field bg string
 ---@field fg string
+---@field gui string
 ---@field link string
 
 ---Set highlight
@@ -56,8 +57,9 @@ M.set_hl = function(name, color)
 
 	local bg = color.bg or 'none'
 	local fg = color.fg or 'none'
+	local gui = color.gui or 'none'
 
-	vim.cmd('hi default ' .. name .. ' guibg=' .. bg .. ' guifg=' .. fg)
+	vim.cmd('hi default ' .. name .. ' guibg=' .. bg .. ' guifg=' .. fg .. ' gui=' .. gui)
 end
 
 M.get_fg = function(name, fallback)
@@ -73,6 +75,7 @@ M.get_fg = function(name, fallback)
 
 	return foreground
 end
+
 M.get_bg = function(name, fallback)
 	local id = vim.api.nvim_get_hl_id_by_name(name)
 	if not id then
@@ -85,6 +88,37 @@ M.get_bg = function(name, fallback)
 	end
 
 	return background
+end
+
+M.get_gui = function(name, fallback)
+	local id = vim.api.nvim_get_hl_id_by_name(name)
+	if not id then
+		return fallback
+	end
+
+	local style_keys = {
+		'bold',
+		'underline',
+		'undercurl',
+		'underdouble',
+		'underdotted',
+		'underdashed',
+		'strikethrough',
+		'reverse',
+		'inverse',
+		'italic',
+		'standout',
+		'altfont',
+		'nocombine',
+	}
+	local style = {}
+	for _, key in ipairs(style_keys) do
+		if vim.fn.synIDattr(id, key) == '1' then
+			table.insert(style, key)
+		end
+	end
+
+	return #style > 0 and table.concat(style, ',') or fallback
 end
 
 ---Replace terminal keycodes
