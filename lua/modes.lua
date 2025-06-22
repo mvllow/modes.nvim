@@ -7,6 +7,7 @@ local default_config = {
 	line_opacity = {
 		copy = 0.15,
 		delete = 0.15,
+		change = 0.15,
 		insert = 0.15,
 		visual = 0.15,
 	},
@@ -52,6 +53,12 @@ local winhighlight = {
 		CursorLineSign = 'ModesDeleteCursorLineSign',
 		CursorLineFold = 'ModesDeleteCursorLineFold',
 	},
+	change = {
+		CursorLine = 'ModesChangeCursorLine',
+		CursorLineNr = 'ModesChangeCursorLineNr',
+		CursorLineSign = 'ModesChangeCursorLineSign',
+		CursorLineFold = 'ModesChangeCursorLineFold',
+	},
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
@@ -83,7 +90,7 @@ M.restore = function()
 end
 
 ---Update highlights
----@param scene 'default'|'insert'|'visual'|'copy'|'delete'
+---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|'change'
 M.highlight = function(scene)
 	if in_ignored_buffer() then
 		return
@@ -143,6 +150,8 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesVisual' })
 		elseif scene == 'insert' then
 			utils.set_hl('ModesOperator', { link = 'ModesInsert' })
+		elseif scene == 'change' then
+			utils.set_hl('ModesOperator', { link = 'ModesChange' })
 		else
 			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
@@ -169,12 +178,19 @@ M.define = function()
 		insert = config.colors.insert or utils.get_bg('ModesInsert', '#78ccc5'),
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
+	colors.change = config.colors.change or colors.delete
+
 	blended_colors = {
 		copy = utils.blend(colors.copy, colors.bg, config.line_opacity.copy),
 		delete = utils.blend(
 			colors.delete,
 			colors.bg,
 			config.line_opacity.delete
+		),
+		change = utils.blend(
+			colors.change,
+			colors.bg,
+			config.line_opacity.change
 		),
 		insert = utils.blend(
 			colors.insert,
@@ -201,6 +217,9 @@ M.define = function()
 	if colors.visual ~= '' then
 		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 	end
+	if colors.change ~= '' then
+		vim.cmd('hi ModesChange guibg=' .. colors.change)
+	end
 
 	local default_operator = utils.get_bg('Cursor', '#524f67')
 	utils.set_hl('ModesDefault', { bg = default_operator })
@@ -215,7 +234,7 @@ M.define = function()
 	end
 
 	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
-	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual', 'Change' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
 			local mode_bg = (mode:lower() == 'visual') and 'none' or blended_colors[mode:lower()]
@@ -308,6 +327,7 @@ M.setup = function(opts)
 		config.line_opacity = {
 			copy = config.line_opacity,
 			delete = config.line_opacity,
+			change = config.line_opacity,
 			insert = config.line_opacity,
 			visual = config.line_opacity,
 		}
@@ -330,6 +350,8 @@ M.setup = function(opts)
 				M.highlight('copy')
 			elseif vim.v.operator == 'd' then
 				M.highlight('delete')
+			elseif vim.v.operator == 'c' then
+				M.highlight('change')
 			end
 		end,
 	})
