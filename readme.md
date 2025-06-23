@@ -29,6 +29,7 @@ require('modes').setup({
 		copy = "#f5c359",
 		delete = "#c75c6a",
 		change = "#c75c6a", -- Optional param, defaults to delete
+		format = "#c79585",
 		insert = "#78ccc5",
 		visual = "#9745be",
 	},
@@ -63,6 +64,7 @@ require('modes').setup({
 | `ModesCopy`     | `guibg=#f5c359` |
 | `ModesDelete`   | `guibg=#c75c6a` |
 | `ModesChange`   | `ModesDelete`   |
+| `ModesFormat`   | `guibg=#c79585` |
 | `ModesInsert`   | `guibg=#78ccc5` |
 | `ModesVisual`   | `guibg=#9745be` |
 
