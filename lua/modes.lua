@@ -8,6 +8,7 @@ local default_config = {
 		copy = 0.15,
 		delete = 0.15,
 		change = 0.15,
+		format = 0.15,
 		insert = 0.15,
 		visual = 0.15,
 	},
@@ -59,6 +60,12 @@ local winhighlight = {
 		CursorLineSign = 'ModesChangeCursorLineSign',
 		CursorLineFold = 'ModesChangeCursorLineFold',
 	},
+	format = {
+		CursorLine = 'ModesFormatCursorLine',
+		CursorLineNr = 'ModesFormatCursorLineNr',
+		CursorLineSign = 'ModesFormatCursorLineSign',
+		CursorLineFold = 'ModesFormatCursorLineFold',
+	},
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
@@ -90,7 +97,7 @@ M.restore = function()
 end
 
 ---Update highlights
----@param scene 'default'|'insert'|'visual'|'copy'|'delete'|'change'
+---@param scene 'default'|'insert'|'visual'|'copy'|'delete'|'change'|'format'
 M.highlight = function(scene)
 	if in_ignored_buffer() then
 		return
@@ -152,6 +159,8 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesInsert' })
 		elseif scene == 'change' then
 			utils.set_hl('ModesOperator', { link = 'ModesChange' })
+		elseif scene == 'format' then
+			utils.set_hl('ModesOperator', { link = 'ModesFormat' })
 		else
 			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
@@ -176,6 +185,7 @@ M.define = function()
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
 		insert = config.colors.insert or utils.get_bg('ModesInsert', '#78ccc5'),
+		format = config.colors.format or utils.get_bg('ModesFormat', '#c79585'),
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	colors.change = config.colors.change or colors.delete
@@ -196,6 +206,11 @@ M.define = function()
 			colors.insert,
 			colors.bg,
 			config.line_opacity.insert
+		),
+		format = utils.blend(
+			colors.format,
+			colors.bg,
+			config.line_opacity.format
 		),
 		visual = utils.blend(
 			colors.visual,
@@ -220,6 +235,9 @@ M.define = function()
 	if colors.change ~= '' then
 		vim.cmd('hi ModesChange guibg=' .. colors.change)
 	end
+	if colors.format ~= '' then
+		vim.cmd('hi ModesFormat guibg=' .. colors.format)
+	end
 
 	local default_operator = utils.get_bg('Cursor', '#524f67')
 	utils.set_hl('ModesDefault', { bg = default_operator })
@@ -234,7 +252,7 @@ M.define = function()
 	end
 
 	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
-	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual', 'Change' }) do
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual', 'Change', 'Format' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
 			local mode_bg = (mode:lower() == 'visual') and 'none' or blended_colors[mode:lower()]
@@ -328,6 +346,7 @@ M.setup = function(opts)
 			copy = config.line_opacity,
 			delete = config.line_opacity,
 			change = config.line_opacity,
+			format = config.line_opacity,
 			insert = config.line_opacity,
 			visual = config.line_opacity,
 		}
@@ -346,12 +365,15 @@ M.setup = function(opts)
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '*:no*',
 		callback = function()
-			if vim.v.operator == 'y' then
+			local operator = vim.v.operator
+			if operator == 'y' then
 				M.highlight('copy')
-			elseif vim.v.operator == 'd' then
+			elseif operator == 'd' then
 				M.highlight('delete')
-			elseif vim.v.operator == 'c' then
+			elseif operator == 'c' then
 				M.highlight('change')
+			elseif operator:match('[=!><g]') then
+				M.highlight('format')
 			end
 		end,
 	})
