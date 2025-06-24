@@ -31,6 +31,7 @@ require('modes').setup({
 		change = "#c75c6a", -- Optional param, defaults to delete
 		format = "#c79585",
 		insert = "#78ccc5",
+		replace = "#245361",
 		visual = "#9745be",
 	},
 
@@ -66,6 +67,7 @@ require('modes').setup({
 | `ModesChange`   | `ModesDelete`   |
 | `ModesFormat`   | `guibg=#c79585` |
 | `ModesInsert`   | `guibg=#78ccc5` |
+| `ModesReplace`  | `guibg=#245361` |
 | `ModesVisual`   | `guibg=#9745be` |
 
 ## Known issues
