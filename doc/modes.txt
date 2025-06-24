@@ -1,0 +1,72 @@
+*modes.nvim* Prismatic line decorations for the adventurous vim user
+*Modes*
+
+MIT License Copyright (c) mvllow
+
+==============================================================================
+
+Features:
+
+- Highlight UI elements based on the current mode.
+
+# Setup ~
+
+Modes setup can be called with your `config` table to modify default
+behaviour.
+
+See |Modes.config| for `config` options and default values.
+
+------------------------------------------------------------------------------
+                                                                *default_config*
+                                `default_config`
+Module config
+
+Default values:
+>lua
+  local default_config = {
+  	colors = {},
+  	line_opacity = {
+  		copy = 0.15,
+  		delete = 0.15,
+  		change = 0.15,
+  		format = 0.15,
+  		insert = 0.15,
+  		visual = 0.15,
+  	},
+  	set_cursor = true,
+  	set_cursorline = true,
+  	set_number = true,
+  	set_signcolumn = true,
+  	ignore = {
+  		'NvimTree',
+  		'lspinfo',
+  		'packer',
+  		'checkhealth',
+  		'help',
+  		'man',
+  		'TelescopePrompt',
+  		'TelescopeResults',
+  		'!minifiles',
+  	},
+  }
+<
+------------------------------------------------------------------------------
+                                                                 *H.highlight()*
+                             `H.highlight`({scene})
+highlights
+Parameters ~
+{scene} '`(default)`'|'copy'|'delete'|'change'|'format'|'insert'|'visual'
+
+------------------------------------------------------------------------------
+                                                                 *Modes.setup()*
+                             `Modes.setup`({opts})
+Module setup
+
+Parameters ~
+{config} `(table|nil)` Module config table. See |Modes.config|.
+
+Usage ~
+`require('modes').setup({})` (replace `{}` with your `config` table)
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

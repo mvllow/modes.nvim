@@ -5,13 +5,13 @@
 ## Usage
 
 ```lua
-use({
-	'mvllow/modes.nvim',
-	tag = 'v0.2.1',
+{
+	"mvllow/modes.nvim",
+	tag = "v0.2.1",
 	config = function()
-		require('modes').setup()
+		require("modes").setup()
 	end
-})
+}
 ```
 
 ![modes.nvim](https://user-images.githubusercontent.com/1474821/127896095-6da221cf-3327-4eed-82be-ce419bdf647c.gif)
@@ -53,7 +53,7 @@ require('modes').setup({
 	-- Disable modes highlights for specified filetypes
 	-- or enable with prefix "!" if otherwise disabled (please PR common patterns)
 	-- Can also be a function fun():boolean that disables modes highlights when true
-	ignore = { 'NvimTree', 'TelescopePrompt', '!minifiles' }
+	ignore = { "NvimTree", "TelescopePrompt", "!minifiles" }
 })
 ```
 
@@ -75,9 +75,21 @@ require('modes').setup({
 _Workaround:_
 
 ```lua
-require('which-key').setup({
+require("which-key").setup({
         triggers_blacklist = {
                 n = { "d", "y" }
         }
 })
+```
+
+## Contributing
+
+Pull requests are welcome and appreciated!
+
+### Generating documentation
+
+Run `make docs` or inside of Neovim, with [mini.doc](https://github.com/echasnovski/mini.doc) in your runtimepath:
+
+```lua
+:luafile scripts/minidoc.lua
 ```
