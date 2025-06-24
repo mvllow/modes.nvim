@@ -96,12 +96,13 @@ end
 
 M.reset = function()
 	M.highlight('default')
-	vim.cmd.redraw()
+	vim.api.nvim_echo({}, false, {}) -- ensure mode-message highlight is updated
 end
 
 M.restore = function()
 	local scene = M.get_scene()
 	M.highlight(scene)
+	vim.api.nvim_echo({}, false, {})
 end
 
 ---Update highlights
