@@ -10,6 +10,7 @@ local default_config = {
 		change = 0.15,
 		format = 0.15,
 		insert = 0.15,
+		replace = 0.15,
 		visual = 0.15,
 	},
 	set_cursor = true,
@@ -66,6 +67,13 @@ local winhighlight = {
 		CursorLineSign = 'ModesInsertCursorLineSign',
 		CursorLineFold = 'ModesInsertCursorLineFold',
 	},
+	replace = {
+		CursorLine = 'ModesReplaceCursorLine',
+		CursorLineNr = 'ModesReplaceCursorLineNr',
+		CursorLineSign = 'ModesReplaceCursorLineSign',
+		CursorLineFold = 'ModesReplaceCursorLineFold',
+		Visual = 'ModesReplaceVisual',
+	},
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
@@ -97,7 +105,7 @@ M.restore = function()
 end
 
 ---Update highlights
----@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'visual'
+---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'visual'
 M.highlight = function(scene)
 	if in_ignored_buffer() then
 		return
@@ -126,6 +134,9 @@ M.highlight = function(scene)
 		if scene == 'default' and detected_scene == 'visual' then
 			winhl_map.CursorLineNr = 'ModesVisualUnfocusedCursorLineNr'
 		end
+		if scene == 'replace' and detected_scene == 'visual' then
+			winhl_map.CursorLineNr = 'ModesVisualReplaceCursorLineNr'
+		end
 	end
 
 	if not config.set_signcolumn then
@@ -141,6 +152,8 @@ M.highlight = function(scene)
 	if vim.api.nvim_get_option_value('showmode', { scope = 'global' }) then
 		if scene == 'insert' then
 			utils.set_hl('ModeMsg', { link = 'ModesInsertModeMsg' })
+		elseif scene == 'replace' then
+			utils.set_hl('ModeMsg', { link = 'ModesReplaceModeMsg' })
 		elseif scene == 'visual' then
 			utils.set_hl('ModeMsg', { link = 'ModesVisualModeMsg' })
 		else
@@ -169,10 +182,13 @@ end
 
 M.get_scene = function()
 	local mode = vim.api.nvim_get_mode().mode
-	if mode:match('[iR]') then
+	if mode:match('^i') then
 		return 'insert'
 	end
-	if mode:match('[vVsS\x16\x13]') then
+	if mode:match('^R') then
+		return 'replace'
+	end
+	if mode:match('^[vVsS\x16\x13]') then
 		return 'visual'
 	end
 
@@ -186,6 +202,7 @@ M.define = function()
 		delete = config.colors.delete or utils.get_bg('ModesDelete', '#c75c6a'),
 		format = config.colors.format or utils.get_bg('ModesFormat', '#c79585'),
 		insert = config.colors.insert or utils.get_bg('ModesInsert', '#78ccc5'),
+		replace = config.colors.replace or utils.get_bg('ModesReplace', '#245361'),
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	colors.change = config.colors.change or colors.delete
@@ -212,6 +229,11 @@ M.define = function()
 			colors.bg,
 			config.line_opacity.insert
 		),
+		replace = utils.blend(
+			colors.replace,
+			colors.bg,
+			config.line_opacity.replace
+		),
 		visual = utils.blend(
 			colors.visual,
 			colors.bg,
@@ -235,6 +257,9 @@ M.define = function()
 	if colors.insert ~= '' then
 		vim.cmd('hi ModesInsert guibg=' .. colors.insert)
 	end
+	if colors.replace ~= '' then
+		vim.cmd('hi ModesReplace guibg=' .. colors.replace)
+	end
 	if colors.visual ~= '' then
 		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 	end
@@ -252,7 +277,7 @@ M.define = function()
 	end
 
 	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
-	for _, mode in ipairs({ 'Copy', 'Delete', 'Change', 'Format', 'Insert', 'Visual' }) do
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Change', 'Format', 'Insert', 'Replace', 'Visual' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
 			local mode_bg = (mode:lower() == 'visual') and 'none' or blended_colors[mode:lower()]
@@ -271,6 +296,11 @@ M.define = function()
 
 	if colors.insert ~= '' then
 		utils.set_hl('ModesInsertModeMsg', { fg = colors.insert })
+	end
+	if colors.replace ~= '' then
+		utils.set_hl('ModesReplaceModeMsg', { fg = colors.replace })
+		utils.set_hl('ModesReplaceVisual', { bg = blended_colors.replace })
+		utils.set_hl('ModesVisualReplaceCursorLineNr', { fg = colors.replace, gui = line_nr_gui })
 	end
 	if colors.visual ~= '' then
 		utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
@@ -291,7 +321,8 @@ M.enable_managed_ui = function()
 		if config.set_cursor then
 			vim.opt.guicursor:append('v-sm:ModesVisual')
 			vim.opt.guicursor:append('i-ve:ModesInsert')
-			vim.opt.guicursor:append('r-o:ModesOperator')
+			vim.opt.guicursor:append('o:ModesOperator')
+			vim.opt.guicursor:append('r:ModesReplace')
 		end
 
 		M.restore()
@@ -306,7 +337,8 @@ M.disable_managed_ui = function()
 	if config.set_cursor then
 		vim.opt.guicursor:remove('v-sm:ModesVisual')
 		vim.opt.guicursor:remove('i-ve:ModesInsert')
-		vim.opt.guicursor:remove('r-o:ModesOperator')
+		vim.opt.guicursor:remove('o:ModesOperator')
+		vim.opt.guicursor:remove('r:ModesReplace')
 
 		-- ensure cursor reset (see https://github.com/neovim/neovim/issues/21018)
 		local cursor = vim.o.guicursor
@@ -348,6 +380,7 @@ M.setup = function(opts)
 			change = config.line_opacity,
 			format = config.line_opacity,
 			insert = config.line_opacity,
+			replace = config.line_opacity,
 			visual = config.line_opacity,
 		}
 	end
@@ -378,6 +411,28 @@ M.setup = function(opts)
 		end,
 	})
 
+	---Set character-replace highlight
+	vim.on_key(function(key)
+		if key ~= 'r' then
+			return
+		end
+
+		local mode = vim.api.nvim_get_mode().mode
+		if mode == 'n' or mode:match('^ni') or mode:match('^[vV\x16]') then
+			-- hide transient mode message not normally seen
+			if vim.o.showmode then
+				vim.o.showmode = false
+				vim.schedule(function()
+					vim.o.showmode = true
+				end)
+			end
+
+			M.highlight('replace')
+			vim.cmd.redrawstatus() -- ensure showcmd area is updated
+			vim.schedule(M.restore) -- restore after motion
+		end
+	end)
+
 	---Set highlights when colorscheme changes
 	vim.api.nvim_create_autocmd('ColorScheme', {
 		pattern = '*',
@@ -389,6 +444,14 @@ M.setup = function(opts)
 		pattern = '*',
 		callback = function()
 			M.highlight('insert')
+		end,
+	})
+
+	---Set replace highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:R*',
+		callback = function()
+			M.highlight('replace')
 		end,
 	})
 
