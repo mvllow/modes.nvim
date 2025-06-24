@@ -128,16 +128,15 @@ M.highlight = function(scene)
 		winhl_map[builtin] = hl
 	end
 
-	if not config.set_number then
-		winhl_map.CursorLineNr = nil
-	elseif not config.set_cursorline then
+	if config.set_number then
 		local detected_scene = M.get_scene()
-		if scene == 'default' and detected_scene == 'visual' then
-			winhl_map.CursorLineNr = 'ModesVisualUnfocusedCursorLineNr'
-		end
 		if scene == 'replace' and detected_scene == 'visual' then
 			winhl_map.CursorLineNr = 'ModesVisualReplaceCursorLineNr'
+		elseif not config.set_cursorline and scene == 'default' and detected_scene == 'visual' then
+			winhl_map.CursorLineNr = 'ModesVisualUnfocusedCursorLineNr'
 		end
+	else
+		winhl_map.CursorLineNr = nil
 	end
 
 	if not config.set_signcolumn then
