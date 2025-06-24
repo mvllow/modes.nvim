@@ -171,10 +171,6 @@ M.highlight = function(scene)
 			utils.set_hl('ModesOperator', { link = 'ModesChange' })
 		elseif scene == 'format' then
 			utils.set_hl('ModesOperator', { link = 'ModesFormat' })
-		elseif scene == 'insert' then
-			utils.set_hl('ModesOperator', { link = 'ModesInsert' })
-		elseif scene == 'visual' then
-			utils.set_hl('ModesOperator', { link = 'ModesVisual' })
 		else
 			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
 		end
