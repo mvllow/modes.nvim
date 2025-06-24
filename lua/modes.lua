@@ -1,7 +1,33 @@
+--- *modes.nvim* Prismatic line decorations for the adventurous vim user
+--- *Modes*
+---
+--- MIT License Copyright (c) mvllow
+---
+--- ==============================================================================
+---
+--- Features:
+---
+--- - Highlight UI elements based on the current mode.
+---
+--- # Setup ~
+---
+--- Modes setup can be called with your `config` table to modify default
+--- behaviour.
+---
+--- See |Modes.config| for `config` options and default values.
+
+---@alias Scene 'copy'|'delete'|'insert'|'normal'|'replace'|'visual'
+
+local Modes = {}
+local H = {}
+
+local config = {}
 local utils = require('modes.utils')
 
-local M = {}
-local config = {}
+--- Module config
+---
+--- Default values:
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 local default_config = {
 	colors = {},
 	line_opacity = {
@@ -28,6 +54,8 @@ local default_config = {
 		'!minifiles',
 	},
 }
+--minidoc_afterlines_end
+--
 local winhighlight = {
 	default = {
 		CursorLine = 'CursorLine',
@@ -81,24 +109,24 @@ local in_ignored_buffer = function()
 		return config.ignore()
 	end
 	return not vim.tbl_contains(config.ignore, '!' .. vim.bo.filetype)
-		 and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
-			 or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
-			 or vim.tbl_contains(config.ignore, vim.bo.filetype))
+		and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
+			or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
+			or vim.tbl_contains(config.ignore, vim.bo.filetype))
 end
 
-M.reset = function()
-	M.highlight('default')
+H.reset = function()
+	H.highlight('default')
 	vim.cmd.redraw()
 end
 
-M.restore = function()
-	local scene = M.get_scene()
-	M.highlight(scene)
+H.restore = function()
+	local scene = H.get_scene()
+	H.highlight(scene)
 end
 
 ---Update highlights
 ---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'visual'
-M.highlight = function(scene)
+H.highlight = function(scene)
 	if in_ignored_buffer() then
 		return
 	end
@@ -122,7 +150,7 @@ M.highlight = function(scene)
 	if not config.set_number then
 		winhl_map.CursorLineNr = nil
 	elseif not config.set_cursorline then
-		local detected_scene = M.get_scene()
+		local detected_scene = H.get_scene()
 		if scene == 'default' and detected_scene == 'visual' then
 			winhl_map.CursorLineNr = 'ModesVisualUnfocusedCursorLineNr'
 		end
@@ -167,7 +195,7 @@ M.highlight = function(scene)
 	end
 end
 
-M.get_scene = function()
+H.get_scene = function()
 	local mode = vim.api.nvim_get_mode().mode
 	if mode:match('[iR]') then
 		return 'insert'
@@ -179,7 +207,7 @@ M.get_scene = function()
 	return 'default'
 end
 
-M.define = function()
+H.define = function()
 	colors = {
 		bg = config.colors.bg or utils.get_bg('Normal', 'Normal'),
 		copy = config.colors.copy or utils.get_bg('ModesCopy', '#f5c359'),
@@ -278,7 +306,7 @@ M.define = function()
 	end
 end
 
-M.enable_managed_ui = function()
+H.enable_managed_ui = function()
 	if in_ignored_buffer() then
 		if config.set_cursorline then
 			vim.o.cursorline = false
@@ -294,11 +322,11 @@ M.enable_managed_ui = function()
 			vim.opt.guicursor:append('r-o:ModesOperator')
 		end
 
-		M.restore()
+		H.restore()
 	end
 end
 
-M.disable_managed_ui = function()
+H.disable_managed_ui = function()
 	if config.set_cursorline then
 		vim.o.cursorline = false
 	end
@@ -315,10 +343,15 @@ M.disable_managed_ui = function()
 		vim.o.guicursor = cursor
 	end
 
-	M.reset()
+	H.reset()
 end
 
-M.setup = function(opts)
+--- Module setup
+---
+---@param config table|nil Module config table. See |Modes.config|.
+---
+---@usage `require('modes').setup({})` (replace `{}` with your `config` table)
+Modes.setup = function(opts)
 	opts = vim.tbl_extend('keep', opts or {}, default_config)
 	if opts.focus_only then
 		vim.notify(
@@ -352,13 +385,13 @@ M.setup = function(opts)
 		}
 	end
 
-	M.define()
-	M.enable_managed_ui() -- ensure enabled initially
+	H.define()
+	H.enable_managed_ui() -- ensure enabled initially
 
 	---Reset normal highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '*:n,*:ni*',
-		callback = M.reset,
+		callback = H.reset,
 	})
 
 	---Set operator highlights
@@ -367,13 +400,13 @@ M.setup = function(opts)
 		callback = function()
 			local operator = vim.v.operator
 			if operator == 'y' then
-				M.highlight('copy')
+				H.highlight('copy')
 			elseif operator == 'd' then
-				M.highlight('delete')
+				H.highlight('delete')
 			elseif operator == 'c' then
-				M.highlight('change')
+				H.highlight('change')
 			elseif operator:match('[=!><g]') then
-				M.highlight('format')
+				H.highlight('format')
 			end
 		end,
 	})
@@ -381,14 +414,14 @@ M.setup = function(opts)
 	---Set highlights when colorscheme changes
 	vim.api.nvim_create_autocmd('ColorScheme', {
 		pattern = '*',
-		callback = M.define,
+		callback = H.define,
 	})
 
 	---Set insert highlight
 	vim.api.nvim_create_autocmd('InsertEnter', {
 		pattern = '*',
 		callback = function()
-			M.highlight('insert')
+			H.highlight('insert')
 		end,
 	})
 
@@ -396,7 +429,7 @@ M.setup = function(opts)
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '*:[vVsS\x16\x13]',
 		callback = function()
-			M.highlight('visual')
+			H.highlight('visual')
 		end,
 	})
 
@@ -404,15 +437,15 @@ M.setup = function(opts)
 	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
 		pattern = '*',
 		callback = function()
-			vim.schedule(M.enable_managed_ui)
+			vim.schedule(H.enable_managed_ui)
 		end,
 	})
 
 	---Disable managed UI
 	vim.api.nvim_create_autocmd({ 'WinLeave', 'FocusLost' }, {
 		pattern = '*',
-		callback = M.disable_managed_ui,
+		callback = H.disable_managed_ui,
 	})
 end
 
-return M
+return Modes

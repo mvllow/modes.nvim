@@ -1,0 +1,5 @@
+H.highlight()	modes.txt	/*H.highlight()*
+Modes	modes.txt	/*Modes*
+Modes.setup()	modes.txt	/*Modes.setup()*
+default_config	modes.txt	/*default_config*
+modes.nvim	modes.txt	/*modes.nvim*

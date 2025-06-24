@@ -16,3 +16,13 @@ clean: clear_dependencies
 .PHONY: test
 test: install_dependencies
 	$(NVIM_HEADLESS) -c "call Test()"
+
+.PHONY: docs
+docs:
+	@echo "Generating documentation..."
+	@nvim --headless --noplugin -u ./scripts/minimal-init.lua -c "luafile scripts/minidoc.lua" -c "qa!"
+
+.PHONY: clean
+clean:
+	@echo "Removing temporary directories..."
+	@rm -rf "/tmp/nvim/site/pack/test/start/mini.doc"
