@@ -11,6 +11,7 @@ local default_config = {
 		format = 0.15,
 		insert = 0.15,
 		replace = 0.15,
+		select = 0.15,
 		visual = 0.15,
 	},
 	set_cursor = true,
@@ -74,6 +75,13 @@ local winhighlight = {
 		CursorLineFold = 'ModesReplaceCursorLineFold',
 		Visual = 'ModesReplaceVisual',
 	},
+	select = {
+		CursorLine = 'ModesSelectCursorLine',
+		CursorLineNr = 'ModesSelectCursorLineNr',
+		CursorLineSign = 'ModesSelectCursorLineSign',
+		CursorLineFold = 'ModesSelectCursorLineFold',
+		Visual = 'ModesSelectVisual',
+	},
 	visual = {
 		CursorLine = 'ModesVisualCursorLine',
 		CursorLineNr = 'ModesVisualCursorLineNr',
@@ -106,7 +114,7 @@ M.restore = function()
 end
 
 ---Update highlights
----@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'visual'
+---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
 M.highlight = function(scene)
 	if in_ignored_buffer() then
 		return
@@ -154,6 +162,8 @@ M.highlight = function(scene)
 			utils.set_hl('ModeMsg', { link = 'ModesInsertModeMsg' })
 		elseif scene == 'replace' then
 			utils.set_hl('ModeMsg', { link = 'ModesReplaceModeMsg' })
+		elseif scene == 'select' then
+			utils.set_hl('ModeMsg', { link = 'ModesSelectModeMsg' })
 		elseif scene == 'visual' then
 			utils.set_hl('ModeMsg', { link = 'ModesVisualModeMsg' })
 		else
@@ -162,16 +172,24 @@ M.highlight = function(scene)
 	end
 
 	if config.set_cursor then
-		if scene == 'copy' then
-			utils.set_hl('ModesOperator', { link = 'ModesCopy' })
+		if scene == 'default' then
+			utils.set_hl('Cursor', { link = 'ModesDefaultCursor' })
+		elseif scene == 'copy' then
+			utils.set_hl('Cursor', { link = 'ModesCopyCursor' })
 		elseif scene == 'delete' then
-			utils.set_hl('ModesOperator', { link = 'ModesDelete' })
+			utils.set_hl('Cursor', { link = 'ModesDeleteCursor' })
 		elseif scene == 'change' then
-			utils.set_hl('ModesOperator', { link = 'ModesChange' })
+			utils.set_hl('Cursor', { link = 'ModesChangeCursor' })
 		elseif scene == 'format' then
-			utils.set_hl('ModesOperator', { link = 'ModesFormat' })
-		else
-			utils.set_hl('ModesOperator', { link = 'ModesDefault' })
+			utils.set_hl('Cursor', { link = 'ModesFormatCursor' })
+		elseif scene == 'insert' then
+			utils.set_hl('Cursor', { link = 'ModesInsertCursor' })
+		elseif scene == 'replace' then
+			utils.set_hl('Cursor', { link = 'ModesReplaceCursor' })
+		elseif scene == 'select' then
+			utils.set_hl('Cursor', { link = 'ModesSelectCursor' })
+		elseif scene == 'visual' then
+			utils.set_hl('Cursor', { link = 'ModesVisualCursor' })
 		end
 	end
 end
@@ -184,8 +202,11 @@ M.get_scene = function()
 	if mode:match('^R') then
 		return 'replace'
 	end
-	if mode:match('^[vVsS\x16\x13]') then
+	if mode:match('^[vV\x16]') then
 		return 'visual'
+	end
+	if mode:match('^[sS\x13]') then
+		return 'select'
 	end
 
 	return 'default'
@@ -202,6 +223,7 @@ M.define = function()
 		visual = config.colors.visual or utils.get_bg('ModesVisual', '#9745be'),
 	}
 	colors.change = config.colors.change or colors.delete
+	colors.select = config.colors.select or colors.visual
 
 	blended_colors = {
 		copy = utils.blend(colors.copy, colors.bg, config.line_opacity.copy),
@@ -229,6 +251,11 @@ M.define = function()
 			colors.replace,
 			colors.bg,
 			config.line_opacity.replace
+		),
+		select = utils.blend(
+			colors.select,
+			colors.bg,
+			config.line_opacity.select
 		),
 		visual = utils.blend(
 			colors.visual,
@@ -260,9 +287,8 @@ M.define = function()
 		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 	end
 
-	local default_operator = utils.get_bg('Cursor', '#524f67')
-	utils.set_hl('ModesDefault', { bg = default_operator })
-	utils.set_hl('ModesOperator', { link = 'ModesDefault' })
+	local default_cursor = utils.get_bg('Cursor', '#524f67')
+	utils.set_hl('ModesDefaultCursor', { bg = default_cursor })
 
 	local default_cursorline = utils.get_bg('CursorLine', '#26233a')
 	if config.set_number then
@@ -273,14 +299,16 @@ M.define = function()
 	end
 
 	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
-	for _, mode in ipairs({ 'Copy', 'Delete', 'Change', 'Format', 'Insert', 'Replace', 'Visual' }) do
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Change', 'Format', 'Insert', 'Replace', 'Select', 'Visual' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
-			local mode_bg = (mode:lower() == 'visual') and 'none' or blended_colors[mode:lower()]
+			local mode_bg = (mode:lower() == 'visual' or mode:lower() == 'select') and 'none' or
+				 blended_colors[mode:lower()]
 			utils.set_hl(('Modes%sCursorLine'):format(mode), { bg = mode_bg })
 			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg, gui = line_nr_gui })
 			utils.set_hl(('Modes%sCursorLineSign'):format(mode), { bg = mode_bg })
 			utils.set_hl(('Modes%sCursorLineFold'):format(mode), { bg = mode_bg })
+			utils.set_hl(('Modes%sCursor'):format(mode), { bg = mode_fg })
 		end
 	end
 
@@ -297,6 +325,10 @@ M.define = function()
 		utils.set_hl('ModesReplaceModeMsg', { fg = colors.replace })
 		utils.set_hl('ModesReplaceVisual', { bg = blended_colors.replace })
 		utils.set_hl('ModesVisualReplaceCursorLineNr', { fg = colors.replace, gui = line_nr_gui })
+	end
+	if colors.select ~= '' then
+		utils.set_hl('ModesSelectModeMsg', { fg = colors.select })
+		utils.set_hl('ModesSelectVisual', { bg = blended_colors.select })
 	end
 	if colors.visual ~= '' then
 		utils.set_hl('ModesVisualModeMsg', { fg = colors.visual })
@@ -315,10 +347,7 @@ M.enable_managed_ui = function()
 		end
 
 		if config.set_cursor then
-			vim.opt.guicursor:append('v-sm:ModesVisual')
-			vim.opt.guicursor:append('i-ve:ModesInsert')
-			vim.opt.guicursor:append('o:ModesOperator')
-			vim.opt.guicursor:append('r:ModesReplace')
+			vim.opt.guicursor:append('a:Cursor')
 		end
 
 		M.restore()
@@ -331,10 +360,7 @@ M.disable_managed_ui = function()
 	end
 
 	if config.set_cursor then
-		vim.opt.guicursor:remove('v-sm:ModesVisual')
-		vim.opt.guicursor:remove('i-ve:ModesInsert')
-		vim.opt.guicursor:remove('o:ModesOperator')
-		vim.opt.guicursor:remove('r:ModesReplace')
+		vim.opt.guicursor:remove('a:Cursor')
 
 		-- ensure cursor reset (see https://github.com/neovim/neovim/issues/21018)
 		local cursor = vim.o.guicursor
@@ -377,6 +403,7 @@ M.setup = function(opts)
 			format = config.line_opacity,
 			insert = config.line_opacity,
 			replace = config.line_opacity,
+			select = config.line_opacity,
 			visual = config.line_opacity,
 		}
 	end
@@ -451,9 +478,17 @@ M.setup = function(opts)
 		end,
 	})
 
+	---Set select highlight
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:[sS\x13]',
+		callback = function()
+			M.highlight('select')
+		end,
+	})
+
 	---Set visual highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
-		pattern = '*:[vVsS\x16\x13]',
+		pattern = '*:[vV\x16]',
 		callback = function()
 			M.highlight('visual')
 		end,
