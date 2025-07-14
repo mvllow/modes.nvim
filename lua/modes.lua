@@ -116,7 +116,7 @@ end
 ---Update highlights
 ---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
 M.highlight = function(scene)
-	if in_ignored_buffer() then
+	if in_ignored_buffer() and scene ~= 'default' then
 		return
 	end
 
@@ -140,8 +140,6 @@ M.highlight = function(scene)
 		local detected_scene = M.get_scene()
 		if scene == 'replace' and detected_scene == 'visual' then
 			winhl_map.CursorLineNr = 'ModesVisualReplaceCursorLineNr'
-		elseif not config.set_cursorline and scene == 'default' and detected_scene == 'visual' then
-			winhl_map.CursorLineNr = 'ModesVisualUnfocusedCursorLineNr'
 		end
 	else
 		winhl_map.CursorLineNr = nil
@@ -312,9 +310,6 @@ M.define = function()
 		end
 	end
 
-	local default_line_nr = utils.get_fg('CursorLineNr', 'Normal')
-	utils.set_hl('ModesVisualUnfocusedCursorLineNr', { fg = default_line_nr, gui = line_nr_gui })
-
 	local default_mode_msg = utils.get_fg('ModeMsg', '#908caa')
 	utils.set_hl('ModesDefaultModeMsg', { fg = default_mode_msg })
 
@@ -341,6 +336,8 @@ M.enable_managed_ui = function()
 		if config.set_cursorline then
 			vim.o.cursorline = false
 		end
+
+		M.reset()
 	else
 		if config.set_cursorline then
 			vim.o.cursorline = true
@@ -368,8 +365,6 @@ M.disable_managed_ui = function()
 		vim.cmd.redrawstatus()
 		vim.o.guicursor = cursor
 	end
-
-	M.reset()
 end
 
 M.setup = function(opts)
@@ -495,7 +490,7 @@ M.setup = function(opts)
 	})
 
 	---Enable managed UI for current window
-	vim.api.nvim_create_autocmd({ 'WinEnter', 'FocusGained' }, {
+	vim.api.nvim_create_autocmd('WinEnter', {
 		pattern = '*',
 		callback = function()
 			vim.schedule(M.enable_managed_ui)
@@ -503,7 +498,7 @@ M.setup = function(opts)
 	})
 
 	---Disable managed UI
-	vim.api.nvim_create_autocmd({ 'WinLeave', 'FocusLost' }, {
+	vim.api.nvim_create_autocmd('WinLeave', {
 		pattern = '*',
 		callback = M.disable_managed_ui,
 	})
