@@ -85,3 +85,14 @@ require('which-key').setup({
         }
 })
 ```
+
+- "Press ENTER" prompt shows when entering vim
+
+_Workaround:_
+
+```lua
+require("modes").setup()
+
+-- Set cmdheight AFTER modes setup
+vim.o.cmdheight = 0
+```
