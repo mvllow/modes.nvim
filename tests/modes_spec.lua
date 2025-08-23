@@ -109,8 +109,15 @@ describe('modes.lua tests:', function()
 				end
 
 				modes.highlight('visual')
+				print(modes_utils.get_fg('visual', 'visual'))
+				print(vim.inspect(vim.api.nvim_get_hl_by_name("ModesVisual", true)))
+				print(vim.inspect(modes_utils.get_fg('visual', 'visual')))
 				assert.truthy(
 					modes_utils.get_fg('visual', 'visual') ~= '#000000'
+				)
+				modes.highlight("normal")
+				assert.truthy(
+					modes_utils.get_bg("normal", "normal") ~= '#000000'
 				)
 			end
 		)
