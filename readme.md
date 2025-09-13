@@ -31,6 +31,8 @@ require('modes').setup({
 		change = "#c75c6a", -- Optional param, defaults to delete
 		format = "#c79585",
 		insert = "#78ccc5",
+		replace = "#245361",
+		select = "#9745be", -- Optional param, defaults to visual
 		visual = "#9745be",
 	},
 
@@ -66,7 +68,21 @@ require('modes').setup({
 | `ModesChange`   | `ModesDelete`   |
 | `ModesFormat`   | `guibg=#c79585` |
 | `ModesInsert`   | `guibg=#78ccc5` |
+| `ModesReplace`  | `guibg=#245361` |
+| `ModesSelect`   | `ModesVisual`   |
 | `ModesVisual`   | `guibg=#9745be` |
+
+## Contributing
+
+Pull requests are welcome and appreciated!
+
+### Generating documentation
+
+Run `make docs` or inside of Neovim, with [mini.doc](https://github.com/echasnovski/mini.doc) in your runtimepath:
+
+```lua
+:luafile scripts/minidoc.lua
+```
 
 ## Known issues
 
@@ -82,14 +98,13 @@ require("which-key").setup({
 })
 ```
 
-## Contributing
+- "Press ENTER" prompt shows when entering vim
 
-Pull requests are welcome and appreciated!
-
-### Generating documentation
-
-Run `make docs` or inside of Neovim, with [mini.doc](https://github.com/echasnovski/mini.doc) in your runtimepath:
+_Workaround:_
 
 ```lua
-:luafile scripts/minidoc.lua
+require("modes").setup()
+
+-- Set cmdheight AFTER modes setup
+vim.o.cmdheight = 0
 ```
