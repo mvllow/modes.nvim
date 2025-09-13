@@ -125,9 +125,9 @@ local in_ignored_buffer = function()
 		return config.ignore()
 	end
 	return not vim.tbl_contains(config.ignore, '!' .. vim.bo.filetype)
-		and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
-			or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
-			or vim.tbl_contains(config.ignore, vim.bo.filetype))
+	    and (vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
+		    or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
+		    or vim.tbl_contains(config.ignore, vim.bo.filetype))
 end
 
 M.reset = function()
@@ -329,9 +329,10 @@ H.define = function()
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
 			local mode_bg = (mode:lower() == 'visual' or mode:lower() == 'select') and 'none' or
-				 blended_colors[mode:lower()]
+			    blended_colors[mode:lower()]
 			utils.set_hl(('Modes%sCursorLine'):format(mode), { bg = mode_bg })
-			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg, gui = line_nr_gui })
+			utils.set_hl(('Modes%sCursorLineNr'):format(mode),
+				{ fg = mode_fg, bg = mode_bg, gui = line_nr_gui })
 			utils.set_hl(('Modes%sCursorLineSign'):format(mode), { bg = mode_bg })
 			utils.set_hl(('Modes%sCursorLineFold'):format(mode), { bg = mode_bg })
 			utils.set_hl(('Modes%sCursor'):format(mode), { bg = mode_fg })
