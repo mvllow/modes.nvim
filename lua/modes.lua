@@ -150,7 +150,7 @@ end
 
 ---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'|'normal'
 ---@private
-M.highlight = function(scene)
+H.highlight = function(scene)
 	if in_ignored_buffer() and scene ~= 'default' then
 		return
 	end
