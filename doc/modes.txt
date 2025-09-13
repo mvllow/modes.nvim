@@ -31,6 +31,8 @@ Default values:
   		change = 0.15,
   		format = 0.15,
   		insert = 0.15,
+  		replace = 0.15,
+  		select = 0.15,
   		visual = 0.15,
   	},
   	set_cursor = true,
@@ -51,11 +53,11 @@ Default values:
   }
 <
 ------------------------------------------------------------------------------
-                                                                 *H.highlight()*
-                             `H.highlight`({scene})
+                                                                 *M.highlight()*
+                             `M.highlight`({scene})
 highlights
 Parameters ~
-{scene} '`(default)`'|'copy'|'delete'|'change'|'format'|'insert'|'visual'
+{scene} '`(default)`'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
 
 ------------------------------------------------------------------------------
                                                                  *Modes.setup()*
