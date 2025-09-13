@@ -566,4 +566,8 @@ Modes.setup = function(opts)
 	})
 end
 
+-- Expose functions for testing
+Modes.highlight = H.highlight
+Modes.disable_managed_ui = H.disable_managed_ui
+
 return Modes
