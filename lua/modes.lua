@@ -130,20 +130,20 @@ local in_ignored_buffer = function()
 		    or vim.tbl_contains(config.ignore, vim.bo.filetype))
 end
 
-M.reset = function()
-	M.highlight('default')
+H.reset = function()
+	H.highlight('default')
 	vim.api.nvim_echo({}, false, {}) -- ensure mode-message highlight is updated
 end
 
-M.restore = function()
-	local scene = M.get_scene()
-	M.highlight(scene)
+H.restore = function()
+	local scene = H.get_scene()
+	H.highlight(scene)
 	vim.api.nvim_echo({}, false, {})
 end
 
----Update highlights
 ---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
-M.highlight = function(scene)
+---@private
+H.highlight = function(scene)
 	if in_ignored_buffer() and scene ~= 'default' then
 		return
 	end
@@ -165,7 +165,7 @@ M.highlight = function(scene)
 	end
 
 	if config.set_number then
-		local detected_scene = M.get_scene()
+		local detected_scene = H.get_scene()
 		if scene == 'replace' and detected_scene == 'visual' then
 			winhl_map.CursorLineNr = 'ModesVisualReplaceCursorLineNr'
 		end
@@ -366,7 +366,7 @@ H.enable_managed_ui = function()
 			vim.o.cursorline = false
 		end
 
-		M.reset()
+		H.reset()
 	else
 		if config.set_cursorline then
 			vim.o.cursorline = true
@@ -479,9 +479,9 @@ Modes.setup = function(opts)
 				end)
 			end
 
-			M.highlight('replace')
+			H.highlight('replace')
 			vim.cmd.redrawstatus() -- ensure showcmd area is updated
-			vim.schedule(M.restore) -- restore after motion
+			vim.schedule(H.restore) -- restore after motion
 		end
 	end)
 
@@ -503,7 +503,7 @@ Modes.setup = function(opts)
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '*:R*',
 		callback = function()
-			M.highlight('replace')
+			H.highlight('replace')
 		end,
 	})
 
@@ -511,7 +511,7 @@ Modes.setup = function(opts)
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '*:[sS\x13]',
 		callback = function()
-			M.highlight('select')
+			H.highlight('select')
 		end,
 	})
 

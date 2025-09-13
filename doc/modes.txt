@@ -53,13 +53,6 @@ Default values:
   }
 <
 ------------------------------------------------------------------------------
-                                                                 *M.highlight()*
-                             `M.highlight`({scene})
-highlights
-Parameters ~
-{scene} '`(default)`'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
-
-------------------------------------------------------------------------------
                                                                  *Modes.setup()*
                              `Modes.setup`({opts})
 Module setup
