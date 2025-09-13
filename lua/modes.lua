@@ -39,6 +39,7 @@ local default_config = {
 		replace = 0.15,
 		select = 0.15,
 		visual = 0.15,
+		normal = 0.15,
 	},
 	set_cursor = true,
 	set_cursorline = true,
@@ -117,6 +118,12 @@ local winhighlight = {
 		CursorLineFold = 'ModesVisualCursorLineFold',
 		Visual = 'ModesVisualVisual',
 	},
+	normal = {
+		CursorLine = 'ModesNormalCursorLine',
+		CursorLineNr = 'ModesNormalCursorLineNr',
+		CursorLineSign = 'ModesNormalCursorLineSign',
+		CursorLineFold = 'ModesNormalCursorLineFold',
+	},
 }
 local colors = {}
 local blended_colors = {}
@@ -141,7 +148,7 @@ H.restore = function()
 	vim.api.nvim_echo({}, false, {})
 end
 
----@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
+---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'|'normal'
 ---@private
 H.highlight = function(scene)
 	if in_ignored_buffer() and scene ~= 'default' then
@@ -216,6 +223,8 @@ H.highlight = function(scene)
 			utils.set_hl('Cursor', { link = 'ModesSelectCursor' })
 		elseif scene == 'visual' then
 			utils.set_hl('Cursor', { link = 'ModesVisualCursor' })
+		elseif scene == 'normal' then
+			utils.set_hl('Cursor', { link = 'ModesNormalCursor' })
 		end
 	end
 end
@@ -234,7 +243,9 @@ H.get_scene = function()
 	if mode:match('^[sS\x13]') then
 		return 'select'
 	end
-
+	if mode:match('^n') then
+		return 'normal'
+	end
 	return 'default'
 end
 
@@ -250,6 +261,7 @@ H.define = function()
 	}
 	colors.change = config.colors.change or colors.delete
 	colors.select = config.colors.select or colors.visual
+	colors.normal = config.colors.normal
 
 	blended_colors = {
 		copy = utils.blend(colors.copy, colors.bg, config.line_opacity.copy),
@@ -288,7 +300,14 @@ H.define = function()
 			colors.bg,
 			config.line_opacity.visual
 		),
+		normal = colors.normal and utils.blend(
+			colors.normal,
+			colors.bg,
+			config.line_opacity.normal
+		) or nil,
 	}
+
+
 
 	---Create highlight groups
 	if colors.copy ~= '' then
@@ -312,6 +331,9 @@ H.define = function()
 	if colors.visual ~= '' then
 		vim.cmd('hi ModesVisual guibg=' .. colors.visual)
 	end
+	if colors.normal and colors.normal ~= '' then
+		vim.cmd('hi ModesNormal guibg=' .. colors.normal)
+	end
 
 	local default_cursor = utils.get_bg('Cursor', '#524f67')
 	utils.set_hl('ModesDefaultCursor', { bg = default_cursor })
@@ -325,7 +347,7 @@ H.define = function()
 	end
 
 	local line_nr_gui = utils.get_gui('CursorLineNr', 'none')
-	for _, mode in ipairs({ 'Copy', 'Delete', 'Change', 'Format', 'Insert', 'Replace', 'Select', 'Visual' }) do
+	for _, mode in ipairs({ 'Copy', 'Delete', 'Change', 'Format', 'Insert', 'Replace', 'Select', 'Visual', 'Normal' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
 			local mode_bg = (mode:lower() == 'visual' or mode:lower() == 'select') and 'none' or
@@ -434,6 +456,7 @@ Modes.setup = function(opts)
 			replace = config.line_opacity,
 			select = config.line_opacity,
 			visual = config.line_opacity,
+			normal = config.line_opacity,
 		}
 	end
 
@@ -443,7 +466,12 @@ Modes.setup = function(opts)
 	---Reset normal highlight
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '*:n,*:ni*',
-		callback = H.reset,
+		callback = function()
+			H.reset()
+			if colors.normal then
+				H.highlight('normal')
+			end
+		end,
 	})
 
 	---Set operator highlights
@@ -537,5 +565,9 @@ Modes.setup = function(opts)
 		callback = H.disable_managed_ui,
 	})
 end
+
+-- Expose functions for testing
+Modes.highlight = H.highlight
+Modes.disable_managed_ui = H.disable_managed_ui
 
 return Modes
