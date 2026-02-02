@@ -495,7 +495,10 @@ Modes.setup = function(opts)
 	vim.api.nvim_create_autocmd('InsertEnter', {
 		pattern = '*',
 		callback = function()
-			H.highlight('insert')
+			local mode = vim.api.nvim_get_mode().mode
+			if not mode:match('^R') then
+					H.highlight('insert')
+			end
 		end,
 	})
 
