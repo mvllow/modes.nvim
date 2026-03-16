@@ -34,6 +34,7 @@ Default values:
   		replace = 0.15,
   		select = 0.15,
   		visual = 0.15,
+  		normal = 0.15,
   	},
   	set_cursor = true,
   	set_cursorline = true,
