@@ -132,13 +132,13 @@ end
 
 H.reset = function()
 	H.highlight('default')
-	vim.api.nvim_echo({}, false, {}) -- ensure mode-message highlight is updated
+	vim.cmd.redraw()
 end
 
 H.restore = function()
 	local scene = H.get_scene()
 	H.highlight(scene)
-	vim.api.nvim_echo({}, false, {})
+	vim.cmd.redraw()
 end
 
 ---@param scene 'default'|'copy'|'delete'|'change'|'format'|'insert'|'replace'|'select'|'visual'
