@@ -26,6 +26,7 @@
 require('modes').setup({
 	colors = {
 		bg = "", -- Optional bg param, defaults to Normal hl group
+		normal = "", -- Optional param or default behavior
 		copy = "#f5c359",
 		delete = "#c75c6a",
 		change = "#c75c6a", -- Optional param, defaults to delete

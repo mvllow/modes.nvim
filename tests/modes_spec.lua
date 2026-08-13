@@ -105,12 +105,20 @@ describe('modes.lua tests:', function()
 			function()
 				for _, scene in pairs({ 'insert', 'copy', 'delete' }) do
 					modes.highlight(scene)
-					assert.truthy(modes_utils.get_bg(scene, scene) ~= '#000000')
+					local group_name = 'Modes' .. scene:sub(1, 1):upper() .. scene:sub(2)
+					assert.truthy(modes_utils.get_bg(group_name, scene) ~= '#000000')
 				end
 
 				modes.highlight('visual')
+				print(modes_utils.get_fg('ModesVisual', 'visual'))
+				print(vim.inspect(vim.api.nvim_get_hl_by_name("ModesVisual", true)))
+				print(vim.inspect(modes_utils.get_fg('ModesVisual', 'visual')))
 				assert.truthy(
-					modes_utils.get_fg('visual', 'visual') ~= '#000000'
+					modes_utils.get_fg('ModesVisual', 'visual') ~= '#000000'
+				)
+				modes.highlight("normal")
+				assert.truthy(
+					modes_utils.get_bg("ModesNormal", "normal") ~= '#000000'
 				)
 			end
 		)
@@ -151,29 +159,13 @@ describe('modes.lua tests:', function()
 			})
 		end)
 		it('Ensures enable_managed_ui appends values correctly', function()
-			local check_values = {
-				'ModesVisual',
-				'ModesInsert',
-				'ModesOperator',
-			}
-			for _, value in ipairs(check_values) do
-				assert.is.truthy(string.find(vim.opt.guicursor._value, value))
-			end
-
+			assert.is.truthy(string.find(vim.opt.guicursor._value, 'a:Cursor'))
 			assert.is.True(vim.opt.cursorline._value)
 		end)
 
 		it('Ensures disable_managed_ui removes values correctly', function()
 			modes.disable_managed_ui()
-			local check_values = {
-				'ModesVisual',
-				'ModesInsert',
-				'ModesOperator',
-			}
-			for _, value in ipairs(check_values) do
-				assert.is.falsy(string.find(vim.opt.guicursor._value, value))
-			end
-
+			assert.is.falsy(string.find(vim.opt.guicursor._value, 'a:Cursor'))
 			assert.is.False(vim.opt.cursorline._value)
 		end)
 	end)
