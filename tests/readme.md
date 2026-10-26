@@ -1,69 +1,67 @@
 # Testing
 
+Tests use [mini.test](https://github.com/echasnovski/mini.test). Each case runs
+in a fresh child Neovim over RPC, so global state (highlights, autocmds) stays
+isolated between cases.
+
 ## Running Tests
 
 To run tests, refer to the `Makefile` in the root directory of this project. Once there, run `make test` to begin tests.
 
-```sh
-make test
-```
-
-If there are issues with dependencies then a clean operation can be ran:
+If dependencies get into a bad state, wipe them and let the next run refetch:
 
 ```sh
 make clean
 ```
 
+To run a single case interactively, load the init and put the cursor on the
+case:
+
+```vim
+:luafile scripts/minimal-init.lua
+:lua require('mini.test').setup()
+:lua MiniTest.run_at_location()
+```
+
 ## Creating Tests
 
-Add new test files to `tests/`, ensuring the filename ends with `spec`. E.g. `my_test_spec.lua`. This new file will automatically be added to the tests.
+Add new files to `tests/`, named `test_*.lua` — the runner collects
+`tests/**/test_*.lua` automatically.
 
-Example test:
+Tests use the native `MiniTest.new_set()` style. A set is a table; assign cases
+as functions and `return` the set:
 
 ```lua
-describe('small test', function()
-	describe('compare text', function()
-		it('should return true that the the text is the same', function()
-			local text = 'some text'
+local new_set = MiniTest.new_set
+local expect = MiniTest.expect
 
-			assert.are.equal(text, 'some text')
-		end)
+local child = MiniTest.new_child_neovim()
+
+local T = new_set({
+	hooks = {
+		pre_case = function()
+			child.restart({ '-u', 'scripts/minimal-init.lua' })
+		end,
+		post_once = function()
+			child.stop()
+		end,
+	},
+})
+
+T['example'] = new_set()
+
+T['example']['setup does not error'] = function()
+	expect.no_error(function()
+		child.lua([[require('modes').setup()]])
 	end)
-end)
+end
+
+return T
 ```
 
-Example output from `make test`:
-
-```
-git clone --depth=1 https://github.com/nvim-lua/plenary.nvim.git dependencies/pack/vendor/start/plenary.nvim
-Cloning into 'dependencies/pack/vendor/start/plenary.nvim'...
-remote: Enumerating objects: 170, done.
-remote: Counting objects: 100% (170/170), done.
-remote: Compressing objects: 100% (151/151), done.
-remote: Total 170 (delta 6), reused 129 (delta 4), pack-reused 0
-Receiving objects: 100% (170/170), 146.36 KiB | 269.00 KiB/s, done.
-Resolving deltas: 100% (6/6), done.
-git clone --depth=1 https://github.com/mvllow/modes.nvim.git dependencies/pack/vendor/start/modes.nvim
-Cloning into 'dependencies/pack/vendor/start/modes.nvim'...
-remote: Enumerating objects: 9, done.
-remote: Counting objects: 100% (9/9), done.
-remote: Compressing objects: 100% (8/8), done.
-remote: Total 9 (delta 0), reused 6 (delta 0), pack-reused 0
-Receiving objects: 100% (9/9), done.
-nvim --headless --noplugin -u tests/minimal.vim -c "call Test()"
-Starting...Scheduling: ./tests/init_spec.lua
-
-========================================
-Testing:        .../tests/init_spec.lua
-Success ||      small test compare text it should return true that the the text is the same
-
-Success:        1
-Failed :        0
-Errors :        0
-========================================
-
-[Process exited 0]
-```
+Drive the child with `child.type_keys(...)` for real input and read state back
+through `child.api` / `child.lua_get`. See `test_modes.lua` and
+`test_ui.lua` for worked examples.
 
 ## Adding Dependencies
 
@@ -73,7 +71,7 @@ In the `Makefile`, new dependencies can be added under `install_dependencies`:
 .PHONY: install_dependencies
 install_dependencies:
 	...
-	git clone --depth=1 https://github.com/MunifTanjim/nui.nvim.git ${DEPENDENCIES_VENDOR}/start/nui.nvim
+	git clone --depth=1 https://github.com/MunifTanjim/nui.nvim.git ${DEPENDENCIES_DIR}/nui.nvim
 ```
 
 To verify all dependencies get installed, run `make install_dependencies`.

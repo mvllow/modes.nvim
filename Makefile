@@ -1,28 +1,20 @@
 DEPENDENCIES_DIR:=dependencies
-DEPENDENCIES_VENDOR:=${DEPENDENCIES_DIR}/pack/vendor
-NVIM_HEADLESS:=nvim --headless --noplugin --clean -u tests/minimal.vim
 
 .PHONY: install_dependencies
 install_dependencies:
-	test -r ${DEPENDENCIES_VENDOR}/start/plenary.nvim || git clone --depth=1 https://github.com/nvim-lua/plenary.nvim.git ${DEPENDENCIES_VENDOR}/start/plenary.nvim
-
-.PHONY: clear_dependencies
-clear_dependencies:
-	rm -rf "${DEPENDENCIES_DIR}"
-
-.PHONY: clean
-clean: clear_dependencies
+	test -r ${DEPENDENCIES_DIR}/mini.test || git clone --depth=1 https://github.com/echasnovski/mini.test.git ${DEPENDENCIES_DIR}/mini.test
+	test -r ${DEPENDENCIES_DIR}/mini.doc || git clone --depth=1 https://github.com/echasnovski/mini.doc.git ${DEPENDENCIES_DIR}/mini.doc
 
 .PHONY: test
 test: install_dependencies
-	$(NVIM_HEADLESS) -c "call Test()"
+	nvim --headless --noplugin -u scripts/minimal-init.lua -c "lua require('mini.test').setup()" -c "lua MiniTest.run()"
 
 .PHONY: docs
-docs:
+docs: install_dependencies
 	@echo "Generating documentation..."
-	@nvim --headless --noplugin -u ./scripts/minimal-init.lua -c "luafile scripts/minidoc.lua" -c "qa!"
+	@nvim --headless --noplugin -u scripts/minimal-init.lua -c "luafile scripts/minidoc.lua" -c "qa!"
 
 .PHONY: clean
 clean:
 	@echo "Removing temporary directories..."
-	@rm -rf "/tmp/nvim/site/pack/test/start/mini.doc"
+	@rm -rf "${DEPENDENCIES_DIR}"

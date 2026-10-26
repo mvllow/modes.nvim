@@ -1,14 +1,11 @@
 --- minimal-init.lua
 ---
 ---@usage
---- nvim -u minimal-init.lua
+--- nvim --headless --noplugin -u scripts/minimal-init.lua -c "lua require('mini.test').setup()" -c "lua MiniTest.run()"
 
-vim.opt.rtp:prepend(".")
-
-vim.o.packpath = "/tmp/nvim/site"
-
-local url = "https://github.com/echasnovski/mini.doc"
-local install_path = "/tmp/nvim/site/pack/test/start/mini.doc"
-if vim.fn.isdirectory(install_path) then
-	vim.fn.system({ "git", "clone", "--depth=1", url, install_path })
+vim.opt.rtp:prepend(vim.fn.getcwd())
+for _, path in
+	ipairs(vim.fn.glob(vim.fn.getcwd() .. '/dependencies/*', true, true))
+do
+	vim.opt.rtp:prepend(path)
 end
