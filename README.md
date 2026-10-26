@@ -1,3 +1,6 @@
+> [!NOTE]
+> This repository has [moved to SourceHut](https://git.sr.ht/~mellow/modes.nvim).
+
 # modes.nvim
 
 > Prismatic line decorations for the adventurous vim user
